@@ -3,6 +3,7 @@ library(fs)
 library(purrr)
 library(stringr)
 library(tidyverse)
+library(readxl)
 # library(kableExtra)
 
 # instalar o pacote read.dbc GITHUB
@@ -17,7 +18,7 @@ if(!require(read.dbc)){
 
 
 'IMPORTANDO SINASC'
-pf.sinasc<-fs::dir_ls("dados/sinasc-dados/", glob = "*.DBC|*.dbc") |>
+pf.sinasc<-fs::dir_ls("data.Need.Project/sinasc-dados/", glob = "*.DBC|*.dbc") |>
   stringr::str_remove_all(pattern = ".DBC|.dbc") |>
   stringr::str_c(pattern=".dbc")
 
@@ -37,7 +38,7 @@ rm(pf.sinasc)
 
 'IMPORTANDO SIM'
 
-pf.sim<-fs::dir_ls("dados/sim-dados/", glob = "*DOGO*.DBC|*DOGO*.dbc") |>
+pf.sim<-fs::dir_ls("data.Need.Project/sim-dados/", glob = "*DOGO*.DBC|*DOGO*.dbc") |>
   stringr::str_remove_all(pattern = ".DBC|.dbc") |>
   stringr::str_c(pattern=".dbc")
 
@@ -53,13 +54,24 @@ simdf<-
 
 rm(pf.sim)
 
-"PROJEÇÕES POPULAÇÃO"
-pop_estimada<-
-  readxl::read_xlsx(
-    path = "estimativa_projecao/projecoes_2018_populacao_2010_2060_20200406.xlsx",
-    skip = 4) |> 
+# "PROJEÇÕES POPULAÇÃO"
+
+url <- "https://ftp.ibge.gov.br/Projecao_da_Populacao/Projecao_da_Populacao_2018/projecoes_2018_populacao_2010_2060_20200406.xls"
+
+download.file(url,
+              destfile = "data.Need.Project/estimativa_projecao/projecoesPopulacao_2010_2060.xls",
+              mode = "wb")  # Baixar o arquivo Excel
+
+rm(url)
+
+pop_estimada <-
+  read_xls(
+     path = "data.Need.Project/estimativa_projecao/projecoesPopulacao_2010_2060.xls",
+     sheet = "GO",
+     skip = 4) |> 
   janitor::clean_names()
 
+pop_estimada
 
 
 # microDatasus------
@@ -75,6 +87,9 @@ pop_estimada<-
 #     year_end = 2021, uf = "GO",
 #     information_system = "SIM-DO") |>
 #   process_sim()
+
+
+
 
 
 # code.Need.Q1 ------
@@ -112,7 +127,7 @@ sinasc.data<-
   data.frame() |>
   rename(ano=Var1,nascidos=Freq)
 
-# Numero de NASCIMENTOS PELO DO SIM
+# Numero de óbtos PELO DO SIM
 sim.data<-
   sim.data$data.obito |>
   lubridate::dmy() |> 
@@ -153,7 +168,7 @@ LexisPlotR::lexis_grid(
            x = seq(as.Date("2000-8-1"), as.Date("2021-8-1"), "years"),
            y = 0.13,
            label = dadoDiagLex$nascidos,
-           color='#1b429e',size = 3.5) +
+           color='#1b429e',size = 3) +
   annotate("text",
            x = seq(as.Date("2000-8-1"), as.Date("2021-8-1"), "years"),
            y = 2.5,
@@ -168,16 +183,16 @@ LexisPlotR::lexis_grid(
     y = "Anos Completos"
   ) +
   theme(
-    # plot.margin = margin(1, .5, 1, 1, unit = "cm"),
+    plot.margin = margin(.5, .5, .5, .5, unit = "cm"),
     plot.title = element_text(size = 14),
     plot.subtitle = element_text(size = 12),
     axis.title.x = element_text(size = 10),
     axis.title.y = element_text(size = 10),
     axis.text.x = element_text(size = 10)
-  ) |> 
+  ) 
 
 
-ggsave(path = "imagens/",
+ggsave(path = "figuras/graficos/",
        filename = "DiagLexis.png",
        dpi = 300,
        width = 12,
@@ -194,6 +209,8 @@ rm(sim.data)
 rm(sinasc.data)
 rm(sim.data)
 rm(dadoDiagLex)
+
+
 
 # code.Need.Q1B ------
 library(tidyverse)
@@ -258,9 +275,8 @@ dadoSobrev<-
   ) |>
   unnest(pb.sobrev) 
 
-
 write.csv(
-  file = "csv/dadoSobrev5.csv",  row.names = FALSE
+  file = "dadoTratado/q1/Sobrev5.csv",  row.names = FALSE
 )
 
 
@@ -272,26 +288,28 @@ write.csv(
 # install.packages("gt")
 
 
-
-
-
-
-library(kableExtra)
-# TABELA
-knitr::kable(
-  x = dadoSobrev,
-  align = "c",
-  caption = "Tabela 1: Probabilidade de um recém-nascido de Goias, das coortes de 2000 a 2016, sobreviver ao primeiro aniversário.",
-  col.names = 
-    c("Ano","Número de Nascimentos", "Numero de Obtos", "Probabilidade de Sobreviver (em cada ano)")) |> 
-  kableExtra::add_footnote(label = "Fonte: Sistemas de Informação sobre Nascidos Vivos (SINASC) e Mortalidade (SIM) do Ministério da Saúde da Unidade Federativa de Goiás, entre os anos de 2000 a 2016.")
-
-
 # co.Remove.NOT.Q1B ------
 
 rm(n.obtos)
 rm(n.nascimentos)
 rm(dadoSobrev)
+
+
+
+
+# library(kableExtra)
+# TABELA
+# knitr::kable(
+#   x = dadoSobrev,
+#   align = "c",
+#   caption = "Tabela 1: Probabilidade de um recém-nascido de Goias, das coortes de 2000 a 2016, sobreviver ao primeiro aniversário.",
+#   col.names = 
+#     c("Ano","Número de Nascimentos", "Numero de Obtos", "Probabilidade de Sobreviver (em cada ano)")) |> 
+#   kableExtra::add_footnote(label = "Fonte: Sistemas de Informação sobre Nascidos Vivos (SINASC) e Mortalidade (SIM) do Ministério da Saúde da Unidade Federativa de Goiás, entre os anos de 2000 a 2016.")
+
+
+
+
 
 # code.Need.Q1C ------
 
@@ -347,31 +365,13 @@ dadoSobrev<-
       .progress = TRUE
     )
   ) |>
-  unnest(pb.sobrev) |> 
+  unnest(pb.sobrev) 
   
   
   write.csv(
-    file = "csv/dadoSobrev1.csv",  row.names = FALSE
+    file = "dadoTratado/q1/Sobrev1.csv",  row.names = FALSE
   )
 
-
-
-
-
-
-
-
-
-
-
-# tabela.1C ------
-knitr::kable(
-  x = dadoSobrev,
-  align = "c",
-  caption = "Tabela 1: Probabilidade de um recém-nascido de Goias, das coortes de 2000 a 2020, sobreviver ao primeiro aniversário.",
-  col.names = 
-    c("Ano","Número de Nascimentos", "Numero de Obtos", "Probabilidade de Sobreviver (em cada ano)")) |> 
-  kableExtra::add_footnote(label = "Fonte: Sistemas de Informação sobre Nascidos Vivos (SINASC) e Mortalidade (SIM) do Ministério da Saúde da Unidade Federativa de Goiás, entre os anos de 2000 a 2020.")
 
 
 # co.Remove.NOT.Q1C ------
@@ -383,31 +383,13 @@ rm(dadoSobrev)
 
 
 
-
-
 # code.Need.Q2 ------
 
-url <- "https://ftp.ibge.gov.br/Projecao_da_Populacao/Projecao_da_Populacao_2018/projecoes_2018_populacao_2010_2060_20200406.xls"
-dest_file <- "projecoes_2018_populacao_2010_2060_20200406.xls"
-sheet_name <- "GO"
-
-download.file(url, dest_file, mode = "wb")  # Baixar o arquivo Excel
-
-library(readxl)
-pop_estimada <- read_excel(dest_file, sheet = sheet_name, skip = 4) |> 
-  janitor::clean_names()
-
-pop_estimada
 
 
 
-# pop_estimada<-
-#   readxl::read_xlsx(
-#     path = "estimativa_projecao/projecoes_2018_populacao_2010_2060_20200406.xlsx",
-#     skip = 4) |> 
 
-#  PROJEÇÕES DA POPULAÇÃO 
-library(tidyverse)
+# library(tidyverse)
 
 popTotal<-
   pop_estimada[46:66,c("grupo_etario","x2010","x2019","x2021")] |>
@@ -446,16 +428,16 @@ popHom <-
 
 # NUMERO DE NASCIMENTOS 
 nascimentos<-
-  sinascdf$dtnasc |>
-  stringr::str_replace(" ","") |>
-  lubridate::dmy() |> 
-  format("%Y") |>
-  table() |>
-  data.frame() |>
-  rename(ano=Var1,nascidos=Freq) |> 
+  sinascdf |>
+  select(ano) |> 
   filter(
     ano %in% c(2010,2019,2021)
-  )
+  ) |> 
+  table() |> data.frame()
+
+nascimentos
+
+
 
 
 
@@ -475,7 +457,7 @@ Calculando TBN-TOTAL'
   relocate(grupo_etario, .before = "ano") |>
   mutate(
     tbnTotal=map2(
-      .x = nascidos,
+      .x = Freq,
       .y = populacao,
       
       .f = ~round(((.x/.y)*1000), digits = 2),
@@ -492,7 +474,7 @@ Calculando TBN-TOTAL'
   relocate(grupo_etario, .before = "ano") |>
   mutate(
     tbnTotal=map2(
-      .x = nascidos,
+      .x = Freq,
       .y = populacao,
       
       .f = ~round(((.x/.y)*1000), digits = 2),
@@ -509,20 +491,13 @@ Calculando TBN-TOTAL'
 
 
 
-# tabela.2A.TBN------
-knitr::kable(
-  x = dadoTBNatali,
-  align = "c",
-  caption = "tabela: Taxa Bruta de Natalidade analisadas para 2010, 2019 e 2021",
-  col.names = 
-    c("Ano","População Projetada", "Numero de Nascimentos", "TBN")) |> 
-  kableExtra::add_footnote(label = "Fonte: Sistemas de Informação sobre Nascidos Vivos (SINASC) do Ministério da Saúde da Unidade Federativa de Goiás, entre os anos de 2000 a 2020. e IBGE")
 
 
 # code.Remove.NOT.TBN------
 
 rm(dadoTBNatali)
 rm(nascimentos)
+
 
 
 
@@ -535,72 +510,38 @@ $$
 $$
 "
 # NUMERO DE NASCIMENTOS 
+# NUMERO DE NASCIMENTOS 
 nascimentos<-
-  sinascdf$dtnasc |>
-  stringr::str_replace(" ","") |>
-  lubridate::dmy() |> 
-  format("%Y") |>
-  table() |>
-  data.frame() |>
-  rename(ano=Var1,nascidos=Freq) |> 
+  sinascdf |>
+  select(ano) |> 
   filter(
     ano %in% c(2010,2019,2021)
-  )
+  ) |> 
+  table() |> data.frame()
+
+nascimentos
 
 
 tfg.mulher <-
   merge(x = popMul,y = nascimentos,  by = "ano", all.x = TRUE ) |>
   relocate(grupo_etario, .before = "ano") |>
   filter(
-    # row_number() %in% c(1,5:11,21,25:31,41, 45:51)
-    row_number() %in% c(5:11,25:31,45:51)
+    row_number() %in% c(1,5:11,21,25:31,41, 45:51)
   ) |> 
   mutate(
     TFG=map2(
-      .x = nascidos,
+      .x = Freq,
       .y = populacao,
       
       .f = ~((.x/.y)*1000),
       .progress = TRUE
     )
   ) |>
-  unnest(TFG) 
-# |>
-#   rename(
-#   `Grupo Etário de Mulheres` = grupo_etario,
-#   `População Feminina Projetada` = populacao,
-#   `Numero de Nascimentos` = nascidos,
-#   `Ano` = ano
-#   )
-# 
-# 
-# tfg.mulher<-
-#   tfg.mulher |>
-#   filter( grupo_etario == "Total") |> 
-#   select(TFG,ano)
-#   
-# tfg.mulher
-# 
-#   tfg.mulher<-sum(tfg.mulher)
-# 
-# tfg.mulher.9<-
-#   tfg.mulher |>
-#   filter( ano == 2019) |> 
-#   select(TFG) 
-#   
-# sum(tfg.mulher.9)
-# 
-#   tfg.mulher<-sum(tfg.mulher)
-# 
-# tfg.mulher21<-tfg.mulher |>
-#   filter( ano == 2021) |> 
-#   select(TFG)
-#   
-# sum(tfg.mulher21)
-# 
-#   tfg.mulher<-5*sum(tfg.mulher)
+  unnest(TFG) |> 
+  filter( grupo_etario == "Total")
 
 
+tfg.mulher
 
 
 
@@ -610,27 +551,10 @@ tfg.mulher <-
 
 
 
-# tabela.2A.TFG------
-
-knitr::kable(
-  x = tfg.mulher,
-  align = "c",
-  caption = "tabela: Taxa Fecundidade Geral em 2010, 2019 e 2021.",
-  label = "Fonte: Sistemas de Informação sobre Nascidos Vivos (SINASC) do Ministério da Saúde da Unidade Federativa de Goiás, para 2010, 2019 e 2021. e IBGE."
-)
-
-
 # code.Need.Q2B.TEF ------
 
-"$$
-  \text{TEF} = \frac{\text{número de filhos nascidos vivos tidos por mulher}}{\text{ano das faixas etárias}}
-$$"
+#  TEF estão dentro do DATAFRAME "tbm.mulher.dado"
 
-"Como 'tbm.mulher.dado', tanto os 'grupos etários como 'população total',
-ambos pelo ano, ao aplicar a função abaixo, obtemos as duas taxas 'TFG e TEF'
-, basta olhar as linhas da coluna 'grupo_etario'."
-
-# A TFG e a TEF estão dentro do DATAFRAME "tbm.mulher.dado"
 # TOTAL POR ANO = linhas 1,21 e 41 obs: # (N/Pbar)*1000 'Basta multiplicar as linhas por 1mil'
 # GRUPO ETARIO= linhas 2:20, 22:40 e 42:60
 
@@ -667,20 +591,13 @@ tef.mulher <-
   unnest(TEF) |> 
   arrange(ano) 
   
+tef.mulher 
   
-  
-  # write.csv( file = "dadoTratado/tef.mulher.csv", row.names = FALSE)
+  # write.csv( file = "dadoTratado/q2/tef.mulher.csv", row.names = FALSE)
 
 
-# pivot_wider(tef.mulher, names_from = ano, values_from = populacao) |> 
 
-# rename(
-#   `Grupo Etário de Mulheres` = grupo_etario,
-#   `População Feminina Projetada` = populacao,
-#   `Numero de Nascimentos por Idade da Mãe` = nasc.IDADE,
-#   `Ano` = ano
-# )
-# tef.mulher
+
 
 
 # GRAFICO TFG ------
@@ -689,8 +606,8 @@ tef.mulher <-
 library(ggplot2)
 library(dplyr)
 
-plot.tfg.mulher<-
-  tef.mulher
+# plot.tfg.mulher<-
+#   tef.mulher
 
 plot.tef.ano<-
   tef.mulher |> 
@@ -714,17 +631,17 @@ plot.tef.ano<-
     
   ) +
   labs(
-    title = "Taxa de Fecundidade Geral de mulheres em idade Reprodutiva",
+    title = "Taxa de Especifica de Fecundidade de mulheres em idade Reprodutiva",
     subtitle = "Dados referentes aos anos de 2010, 2019 e 2021",
     x = "Anoa",
-    y = "Taxa de Fecundidade Geral",
+    y = "Taxa de Especifica Fecundidade",
     caption = "Ano")
 
 
 plot.tef.ano
 
 
-ggsave(path = "imagens/",
+ggsave(path = "figuras/graficos/",
        filename = "plot.tef.ano.png", plot = plot.tef.ano,
        dpi = 300,
        width = 12,
@@ -737,17 +654,17 @@ ggsave(path = "imagens/",
 
 
 
-
 # code.Need.Q2A.TBR ----
 # Taxa Bruta de Reprodução
 
-tef.mulher<- tef.mulher |> 
-  arrange(ano)
+# tef.mulher<- tef.mulher |> 
+#   arrange(ano)
 
 TEF.2010<-
   tef.mulher |> 
   filter(
-    grupo_etario %in% c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49") & ano %in% 2010  ) |> 
+    grupo_etario %in% c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49") & 
+      ano %in% 2010  ) |> 
   select(TEF)|> 
   sum()
 
@@ -755,7 +672,8 @@ TEF.2010<-
 TEF.2019<-
   tef.mulher |> 
   filter(
-    grupo_etario %in% c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49") & ano %in% 2019  ) |> 
+    grupo_etario %in% c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49") & 
+      ano %in% 2019  ) |> 
   select(TEF)|> 
   sum()
 
@@ -763,20 +681,27 @@ TEF.2019<-
 TEF.2021<-
   tef.mulher |> 
   filter(
-    grupo_etario %in% c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49") & ano %in% 2021  ) |> 
+    grupo_etario %in% c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49") & 
+      ano %in% 2021  ) |> 
   select(TEF)|> 
   sum()
 
 # RESPOSTA
-TEF.2010.5<-(5*TEF.2010)/2.05
-TEF.2019.5<-5*TEF.2019
-TEF.2021.5<-5*TEF.2021
+TEF.2010.5<-
+  (5*TEF.2010)
+
+TEF.2019.5<-
+  5*TEF.2019
+
+TEF.2021.5<-
+  5*TEF.2021
 
 "
 TEF.2010 == 2.001883
 TEF.2019 == 2.072548
 TEF.2021 == 1.953119
 "
+
 
 
 
@@ -792,6 +717,7 @@ TEF.2021 == 1.953119
 # code.Need.Q2A.TLR ------
 
 # code.Need.Q3A ------
+
 dtobto<-
   simdf[simdf$ano %in% c("2010","2019","2021"),c("ano","dtobito")] |>
   select("ano") |>
@@ -826,46 +752,127 @@ tbmMulher<-
       .f = ~((.x/.y)),
       .progress = TRUE
     )
-  ) |> unnest(TBM)
-
+  ) |> unnest(TBM) 
+ 
 # 
 
 tbmHomem |> 
   filter(
     grupo_etario %in% "Total"
+  ) |> 
+  mutate(
+    TBM = (TBM)*1000
   )
 
 tbmMulher |> 
   filter(
     grupo_etario %in% "Total"
+  ) |> 
+  mutate(
+    TBM = (TBM)*1000
   )
 
 
 # code.Need.Q3A.TEM ------
 #  RESPOSTA 
-tbmHomem<-tbmHomem |> 
+
+
+
+
+# |> 
+#   write.csv( file = "dadoTratado/tbmHomem.TEspefic.mort.csv", row.names = FALSE)
+tbmHomem<-
+  tbmHomem |> 
   filter(
     ! grupo_etario %in% "Total"
-  ) |> 
-  write.csv( file = "dadoTratado/tbmHomem.TEspefic.mort.csv", row.names = FALSE)
-
-tbmMulher |> 
-  filter(
-    !  grupo_etario %in% "Total"
   )
 
+tbmMulher<-
+  tbmMulher |> 
+  filter(
+    !grupo_etario %in% "Total")
+
+TBM.H.M<-
+  merge(x = tbmMulher, y = tbmHomem, by = c("ano","grupo_etario")) |> 
+  select(ano,grupo_etario,TBM.x,TBM.y)
+# |> 
+#   filter(!grupo_etario %in% "Total")
 
 
-ggplot(tbmHomem, aes(x = grupo_etario, y = TBM, fill = ano)) +
-  geom_line(color = "white") +
-  scale_fill_gradient(low = "white", high = "blue") +
-  labs(
-    title = "Taxa de Mortalidade Bruta por Grupo Etário e Ano",
-    x = "Ano",
-    y = "Grupo Etário",
-    fill = "TBM"
-  ) +
+# Carregar a biblioteca necessária
+library(ggplot2)
+
+#  DESEJADO ----
+
+
+plot.tbm.mulher<-
+  TBM.H.M %>%
+  filter(grupo_etario != "Total" & grupo_etario != "Ignorado") %>%
+  select(ano, grupo_etario, TBM.x) |> 
+  ggplot(aes(x = grupo_etario, y = TBM.x, group = ano, color = factor(ano))) +
+  geom_line(size = 1.5) +
+  geom_point(size = 3) +
+  scale_y_log10() +
+  labs(x = "Grupo Etário", y = "TBM") +
+  ggtitle("Taxas Específicas de Mortalidade Feminina por idade ") +
+  scale_color_manual(values = c("purple", "gold", "lightblue"),
+                     labels = c("2010", "2019", "2021"),
+                     name = "Ano") +
   theme_minimal()
+
+plot.tbm.homem<-
+  TBM.H.M %>%
+  filter(grupo_etario != "Total" & grupo_etario != "Ignorado") %>%
+  select(ano, grupo_etario, TBM.y) |> 
+  ggplot(aes(x = grupo_etario, y = TBM.y, group = ano, color = factor(ano))) +
+  geom_line(size = 1.5) +
+  geom_point(size = 3) +
+  scale_y_log10() +
+  labs(x = "Grupo Etário", y = "TBM") +
+  ggtitle("Taxas Específicas de Mortalidade Masculina por idade") +
+  scale_color_manual(values = c("darkgreen", "darkgrey", "green"),
+                     labels = c("2010", "2019", "2021"),
+                     name = "Ano") +
+  theme_minimal()
+
+
+
+# library(patchwork)
+ploy.tbm.mulher.homem<-
+  plot.tbm.mulher /plot.tbm.homem +
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+# AS TBMs MUlher-Homem nos 3 anos  
+
+# plot.tbm<-
+  TBM.H.M |> 
+  ggplot(aes(x = grupo_etario, group = ano)) +
+  geom_line(aes(y = TBM.x, color = "Mulher"), size = 1.5, linetype = "solid") +
+  geom_point(aes(y = TBM.x, color = "Mulher"), size = 3, fill = "darkorange") +
+  geom_line(aes(y = TBM.y, color = "Homem"), size = 1.5, linetype = "solid") +
+  geom_point(aes(y = TBM.y, color = "Homem"), size = 3, fill = "steelblue") +
+  scale_y_log10() +
+  labs(x = "Grupo Etário", y = "") +
+  ggtitle("Taxas Específicas de Mortalidade por idade e sexo") +
+  scale_color_manual(values = c("Mulher" = "darkorange", "Homem" = "steelblue"),
+                     labels = c("Mulher", "Homem"),
+                     name = "Sexo") +
+  facet_wrap(~ano, ncol = 1) +
+  theme_minimal()
+
+
+
+# install.packages("patchwork")
+
+
+
+
+
+
+
+# -----------------
+
 
 "Em 'df.M.Q3A', Há as informações de total de homens e os grupos etários.
 Assim, nessas linhas 'Totais' já contem a informação da TBM e TEM por idade,
