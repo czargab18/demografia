@@ -833,7 +833,7 @@ library(microdatasus)
   - modalidade `Arquivos auxiliares para tabulação`, `Dados` e `Documentação`.  
   Ao clicar em *Dados*, em Modadlidade  
   - Tipo de dado, baixou-se todos exceto *DOMAT - Declarações de Óbitos maternos - 1996 a 2021*  
-  - Ano: selecionou de 2002 a 2021  
+  - Ano: selecionou de 2000 a 2021  
   - UF, Unidade Federativa, `GO`.  
     
   

@@ -325,15 +325,26 @@ filhas<-
   rename(numero.filhas=Freq) 
 
 
-# dado.tef.finlhas<-
+funcaoTbL<-
+  function(x,y,z){
+    (x/y)*(z/100000)
+    }
+
+dado.tef.finlhas<-
   merge(x = popMul,y = filhas,  by = c("grupo_etario","ano")) |> 
-  merge(y = nLx.Tabua.F, by = c("grupo_etario","ano")) |> arrange(ano) |> 
+  merge(y = nLx.Tabua.F, by = c("grupo_etario","ano")) |> 
     mutate(
-      populacao = as.numeric(populacao), 
-      numero.filhas = as.numeric(numero.filhas), 
-      nLx = as.numeric(nLx),
-      TLR = (numero.filhas/populacao) / (nLx/100000)
-    ) |> arrange(grupo_etario)
+      TEF.f = map2(.x = numero.filhas, .y= populacao,
+                   ~(.x/.y)),
+      TLR = map2(.x = TEF.f, .y= nLx,
+                                        ~(.x*(.y/100000))
+                   )) |> 
+  unnest(c(TEF.f,TLR))
+
+  
+  
+  
+
   
 # calculo final 
 
