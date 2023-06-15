@@ -385,10 +385,6 @@ rm(dadoSobrev)
 
 # code.Need.Q2 ------
 
-
-
-
-
 # library(tidyverse)
 
 popTotal<-
@@ -442,7 +438,9 @@ nascimentos
 
 
 
+
 # code.Need.Q2A.TBN ------
+
 # - Taxa Bruta de Natalidade (TBN)
 "$$
   TBN = \frac{N}{\bar{P}} \times 1000
@@ -706,6 +704,7 @@ TEF.2021 == 1.953119
 
 
 # code.Need.Q2A.TLR------
+
 
 
 # Q2B.ComparacTaxas------
