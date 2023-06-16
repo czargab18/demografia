@@ -227,7 +227,7 @@ data.frame(ano = c(2010, 2019, 2021),
 # - Taxa Buta de Reprodução
 
 filhas<-
-sinascdf |> 
+  sinascdf |> 
   filter(ano %in% c(2010, 2019, 2021)  & sexo %in% c(2, "F")) |> 
   mutate(
     idademae = as.numeric(as.character(idademae)),
@@ -301,11 +301,11 @@ TBR.2021
 
 # - Taxa Liquida de Reprodução
 
-nLx.Tabua.F<-
-  TabuaVidaFeminina |> 
-  filter(
-    grupo_etario %in% c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49")
-    )
+# nLx.Tabua.F<-
+#   TabuaVidaFeminina |> 
+#   filter(
+#     grupo_etario %in% c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49")
+#     )
 
 
 filhas<-
@@ -325,20 +325,15 @@ filhas<-
   rename(numero.filhas=Freq) 
 
 
-funcaoTbL<-
-  function(x,y,z){
-    (x/y)*(z/100000)
-    }
 
 dado.tef.finlhas<-
   merge(x = popMul,y = filhas,  by = c("grupo_etario","ano")) |> 
-  merge(y = nLx.Tabua.F, by = c("grupo_etario","ano")) |> 
+  merge(y = TabuaVidaFeminina, by = c("grupo_etario","ano")) |> 
     mutate(
-      TEF.f = map2(.x = numero.filhas, .y= populacao,
-                   ~(.x/.y)),
-      TLR = map2(.x = TEF.f, .y= nLx,
-                                        ~(.x*(.y/100000))
-                   )) |> 
+      TEF.f = map2(.x = numero.filhas, .y= populacao, ~(.x/.y)),
+      
+      TLR = map2(.x = TEF.f, .y= nLx,  ~((.x)*(.y/100000))     )) |> 
+  
   unnest(c(TEF.f,TLR))
 
   
@@ -383,4 +378,49 @@ TLR.2010
 TLR.2019
 TLR.2021
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# code.Remove  -----
+
+
+rm(dado.tbr)
+rm(dado.tef.finlhas)
+rm(dadoDiagLex)
+rm(filhas)
+rm(funcaoTbL)
+rm(nascimentos)
+rm(nLx.Tabua.F)
+rm(plot.tef.ano)
+rm(TBR.2010)
+rm(TBR.2019)
+rm(TBR.2021)
+rm(tef.mulher)
+rm(tfg.mulher)
+rm(TFT.2010)
+rm(TFT.2019)
+rm(TFT.2021)
+rm(TLR.2010)
+rm(TLR.2019)
+rm(TLR.2021)
 

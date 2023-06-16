@@ -662,11 +662,13 @@ dtobto<-simdf[simdf$ano %in% c("2010","2019","2021"),c("ano","dtobito")] |>
   rename(numero=Freq)
 
 # TBM HOMENS
-df.H.Q3A<-merge(
+df.H.Q3A<-
+  merge(
   x = popHom, y = dtobto,
   by = "ano",all.x = TRUE)
 
-df.H.Q3A<-df.H.Q3A |>
+df.H.Q3A<-
+  df.H.Q3A |>
   mutate(
     TBM=map2(
       .x = df.H.Q3A$numero,

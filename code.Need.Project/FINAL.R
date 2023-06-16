@@ -727,6 +727,7 @@ dtobto<-
 
 
 # code.Need.Q3A.TBM ------
+
 # TBM HOMENS
 tbmHomem<-
   merge( x = popHom, y = dtobto, by = "ano",all.x = TRUE) |> 
@@ -1088,7 +1089,7 @@ n1.obtos<-n1.obtos[
 
 # OBTO < 5 ANOS
 n5.obtos<-
-  simdf[simdf$idade %in% 400:404,c("idade","ano","dtobito", "dtnasc")] |> 
+  simdf[simdf$idade %in% 000:404,c("idade","ano","dtobito", "dtnasc")] |> 
   select(dtobito) |>
   dplyr::mutate(
     dtobito=format(
