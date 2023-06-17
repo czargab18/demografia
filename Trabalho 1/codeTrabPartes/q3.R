@@ -3,12 +3,6 @@
 popMul
 popHom
 
-dtobto<-
-  simdf[simdf$ano %in% c("2010","2019","2021"),c("ano","dtobito")] |>
-  select("ano") |>
-  table() |>
-  data.frame() |>
-  rename(numObtos=Freq)
 
 # Taxa Bruta de Mortalidade
 
@@ -22,7 +16,8 @@ tbm.homem<-
       .y = populacao,
       
       .f = ~round( ((.x/.y)*1000), digits = 2) )     ) |> 
-  filter(  grupo_etario %in% "Total" )
+  filter(  grupo_etario %in% "Total" ) # Taxa Bruta de Mortalidade
+# filter( ! grupo_etario %in% "Total" )  "Taxa Especifica de Mortalidade"
 
 tbm.homem
 
@@ -36,46 +31,14 @@ tbm.mulher<-
       .y = populacao,
       
       .f = ~round(   ((.x/.y)*1000),   digits = 2) )   ) |>  
-  filter(  grupo_etario %in% "Total" )
+  filter(  grupo_etario %in% "Total" ) # Taxa Bruta de Mortalidade
+  # filter( ! grupo_etario %in% "Total" )  "Taxa Especifica de Mortalidade"
 
 
 tbm.mulher
 
 rm(tbm.homem)
 rm(tbm.mulher)
-
-# Taxa Especifica de Mortalidade
-
-tbm.homem<-
-  merge(
-    x = popHom, y = dtobto,
-    by = "ano",all.x = TRUE) |> 
-  mutate(
-    TBM=map2(
-      .x = numObtos,
-      .y = populacao,
-      
-      .f = ~round( ((.x/.y)), digits = 3) )     ) |> 
-  unnest(TBM) |> 
-  filter(  !grupo_etario %in% "Total" ) 
-
-tbm.homem
-
-tbm.mulher<-
-  merge(
-    x = popMul, y = dtobto,
-    by = "ano",all.x = TRUE) |> 
-  mutate(
-    TBM=map2(
-      .x = numObtos,
-      .y = populacao,
-      
-      .f = ~round(   ((.x/.y)),   digits = 3) ))  |> 
-  unnest(TBM) |> 
-  filter(  !grupo_etario %in% "Total" )
-
-
-tbm.mulher
 
 
   merge(tbm.homem, tbm.mulher, by = c("grupo_etario","ano")) |> 
@@ -178,23 +141,110 @@ rm(tbm.mulher)
 # b) Calcule a TMI, utilizando o número médio de óbitos ocorridos entre 2019 e 2021
 #    e o número de nascimentos de 2020. 
 
+"nascimentos"
+nasc_2020<- sinascdf[sinascdf$ano %in% 2020, ] |> select(ano) |> nrow()
+
+# TMI 1 ANO  = (u/nasc_2020)*1000, u=(0btos_2010_219_2021  < 1 )/3
+
+"numero delinhas /3 anos"
+u<- 
+  ( simdf[simdf$ano %in% c(2010,2019,2020),c("ano","idade")] |> 
+      filter(idade %in% 000:400) |> nrow()  )/3
+
+
+TMI.1.ano <-  (u/nasc_2020)*1000
+
+
+# TMI 5 ANO  = (u/nasc_2020)*1000, u=(0btos_2010_219_2021  < 1 )/3
+
+u<-
+  ( simdf[simdf$ano %in% c(2010,2019,2020),c("ano","idade")] |> 
+      filter(idade %in% 000:404) |> nrow()  )/3
+
+TMI.5.ano <-  (u/nasc_2020)*1000
 
 
 
 
 
+#  Calcule os indicadores: ----------------------------------------------
 
 
-
-
-# Calcule os indicadores:
 # taxa de mortalidade neonatal,
+u<-
+  ( simdf[simdf$ano %in% c(2010,2019,2020),c("ano","idade")] |> 
+      filter(idade %in% 000:227) |> nrow()  )/3
+
+TMI.neo <-  (u/nasc_2020)*1000
+
+
+
+
 # neonatal precoce,
+u<-
+  ( simdf[simdf$ano %in% c(2010,2019,2020),c("ano","idade","sexo")] |> 
+      filter(idade %in% 000:207 ) |> nrow()  )/3
+
+TMI.prec <-  (u/nasc_2020)*1000
+
+
 # neonatal tardia,
+
+u<-
+  ( simdf[simdf$ano %in% c(2010,2019,2020),c("ano","idade")] |> 
+      filter(idade %in% 207:227) |> nrow()  )/3
+
+TMI.neo <-  (u/nasc_2020)*1000
+
+
+
 # posneonatal.
+u<-
+  ( simdf[simdf$ano %in% c(2010,2019,2020),c("ano","idade")] |> 
+      filter(idade %in% 207:227) |> nrow()  )/3
+
+TMI.pos <-  (u/nasc_2020)*1000
+
+# neonatal perinatal
+
+{
+(   
+  (
+    (    simdf[simdf$ano %in% c(2010,2019,2020),c("ano","idade")] |> 
+       filter(idade %in% 000:207) |> nrow() 
+       )
+                                +
+       ( 
+         simdf[simdf$ano %in% c(2010,2019,2020),c("ano","semagestac")] |> 
+       filter(  ! semagestac %in% 00:21) |> nrow()
+       )
+    
+  )/3
+)/nasc_2020
+} 
+
+
+# code.Need.Q3B.TMIperineo ---
 
 
 
-# Agregando a informação sobre óbitos fetais para os mesmos anos,
-# calcule a taxa de mortalidade perinatal.
+
+
+# data frame TAXAS Mortalidade Infantil ----
+
+
+
+tabela3b <- data.frame('Dados' = "Goiás 2018-2020",
+                       'Infantil' = TMI*1000,
+                       'Neonatal' = tx_mort_neotal*1000,
+                       'Neonatal Precoce' = tx_mort_neotal_precoce*1000,
+                       'Neonatal Tardia' = tx_mort_neotal_tardia*1000,
+                       'Pós Neonatal' = tx_mort_posneotal*1000,
+                       'Neonatal Perinatal' = tx_mort_neotal_perinatal*1000,
+                       'Obitos Fetais' = tx_mort_obitos_fetais*1000)
+
+colnames(tabela3b) <- c('Dados', 'Infantil','Neonatal', 'Neonatal Precoce', 'Neonatal Tardia', 'Pós Neonatal', 'Neonatal Perinatal', 'Obitos Fetais')
+
+
+
 

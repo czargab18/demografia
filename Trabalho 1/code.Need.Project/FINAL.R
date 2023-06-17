@@ -930,17 +930,8 @@ tmi.5q0
 "TMI = obitos<1/nascimentos"
 
 num.medio<-
-  simdf[simdf$idade %in% 400:401,c("ano","dtobito")] |> 
-  select(dtobito) |>
-  mutate(
-    dtobito=format(
-      dmy(dtobito),"%Y"),
-  ) |> 
-  filter(
-    dtobito %in% 2019:2021
-  ) |> 
-  table() |> 
-  mean()
+ simdf[simdf$ano %in%  2019:2021,] |> 
+  select(idade) |> nrow()
 
 # RESPOSTA
 tmi.1q0 <- 
@@ -1065,6 +1056,8 @@ tmi <- (num.medio/sinasc.data$nascidos)*1000
 # code.Need.Q3B.TMIperineo ----
 
 # code.Need.Q3C ----
+
+
 
 # code.Need.Q3D ----
 
@@ -1235,30 +1228,6 @@ popHom[popHom$ano %in% 2021,] |>
 
 
   write.csv(file = "dadoTratado/base.TabVida.Homem.xls", row.names = FALSE)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
