@@ -10,3 +10,6 @@ cache.Codes
 .httr-oauth
 .DS_Store
 .quarto
+
+dataProject/
+Atividaes/PadronTaxas/dataProject
