@@ -28,16 +28,20 @@
 
 
 "Manualmente"
-library(tidyverse)
+# library(tidyverse)
 library(readxl)
 library(dplyr)
+library(purrr)
+library(ggplot2)
+library(tidyr)
+library(stringr)
 
 
 
 
 mortalidade <-
   readxl::read_xlsx(
-    path = "dataProject/WPP2022_MORT_F01_1_DEATHS_SINGLE_AGE_BOTH_SEXES.xlsx",
+    path = "Atividades/PadronTaxas/dataProject/WPP2022_MORT_F01_1_DEATHS_SINGLE_AGE_BOTH_SEXES.xlsx",
     sheet = "Estimates",     
     range = "A17:DH17302",
     skip = 16,
@@ -86,7 +90,7 @@ rm(populacao)
 
 populacao <-
   readxl::read_xlsx(
-    path = "dataProject/WPP2022_POP_F01_1_POPULATION_SINGLE_AGE_BOTH_SEXES.xlsx",
+    path = "Atividades/PadronTaxas/dataProject/WPP2022_POP_F01_1_POPULATION_SINGLE_AGE_BOTH_SEXES.xlsx",
     sheet = "Estimates",     
     range = "A17:DH17302",
     skip = 16,
@@ -145,7 +149,7 @@ total<-
 
 dadoCompleto  <-   rbind(dado,total)
 
-View(dadoCompleto)
+# View(dadoCompleto)
 
 
 # notNeed
