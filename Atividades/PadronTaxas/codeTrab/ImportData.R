@@ -55,19 +55,19 @@ mortalidade <-
         "sdmx_code","type","parent_code")
   ) |>
   rename(
-    regiao = region_subregion_country_or_area,
+    populacao = region_subregion_country_or_area,
     ano = year
   ) |> 
   filter(
-    regiao %in% c("WORLD","Brazil","United Republic of Tanzania") & ano %in% 2019 ) |> 
+    populacao %in% c("WORLD","Brazil","United Republic of Tanzania") & ano %in% 2019 ) |> 
   pivot_longer(
     cols = starts_with("x"),
     names_to = "idadeSimples",
-    values_to = "numObitos") |> 
+    values_to = "nDx") |> 
   mutate(    idadeSimples = str_remove_all(idadeSimples,pattern = "x")    ) |> 
-  dplyr::relocate(idadeSimples, .before = "regiao") |> 
+  dplyr::relocate(idadeSimples, .before = "populacao") |> 
   
-  mutate( numObitos = as.numeric(as.character(numObitos)),
+  mutate( nDx = as.numeric(as.character(nDx)),
           
           idadeSimples = as.numeric(as.character(idadeSimples)),
           idadeSimples = cut(
@@ -78,15 +78,15 @@ mortalidade <-
                                         "80-100"),
                              include.lowest = TRUE) 
           ) |> 
-  group_by(regiao,idadeSimples) |> 
-  summarise(numObitos = sum(as.numeric(numObitos)))
+  group_by(populacao,idadeSimples) |> 
+  summarise(nDx = sum(as.numeric(nDx)))
 
 
-# View(mortalidade)
+View(mortalidade)
 
 # POPULAÇÃO
 
-rm(populacao)
+
 
 populacao <-
   readxl::read_xlsx(
@@ -104,18 +104,18 @@ populacao <-
         "sdmx_code","type","parent_code")
   ) |>
   rename(
-    regiao = region_subregion_country_or_area,
+    populacao = region_subregion_country_or_area,
     ano = year
   ) |> 
   filter(
-    regiao %in% c("WORLD","Brazil","United Republic of Tanzania") & ano %in% 2019 ) |> 
+    populacao %in% c("WORLD","Brazil","United Republic of Tanzania") & ano %in% 2019 ) |> 
   pivot_longer(
     cols = starts_with("x"),
     names_to = "idadeSimples",
-    values_to = "numPopulacao") |> 
+    values_to = "nPx") |> 
   mutate(    idadeSimples = str_remove_all(idadeSimples,pattern = "x")    ) |> 
-  dplyr::relocate(idadeSimples, .before = "regiao") |> 
-  mutate( numPopulacao = as.numeric(as.character(numPopulacao)),
+  dplyr::relocate(idadeSimples, .before = "populacao") |> 
+  mutate( nPx = as.numeric(as.character(nPx)),
           idadeSimples = as.numeric(as.character(idadeSimples)),
           idadeSimples = cut(
             idadeSimples, c(0,1,5,10,15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80,100),
@@ -125,31 +125,37 @@ populacao <-
                                         "80-100"),
                              include.lowest = TRUE) 
           ) |> 
-  group_by(regiao,idadeSimples) |> 
-  summarise(numPopulacao = sum(as.numeric(numPopulacao)))
+  group_by(populacao,idadeSimples) |> 
+  summarise(nPx = sum(as.numeric(nPx)))
 
 
 # JUNTANDO AS DUAS BASES
 
 dado<-
-  merge(x = populacao, y = mortalidade, by = c("regiao","idadeSimples")) |> 
-  relocate(numObitos, .before = "numPopulacao") |> 
-  relocate(idadeSimples, .before = "regiao")
+  merge(x = populacao, y = mortalidade, by = c("populacao","idadeSimples")) |> 
+  relocate(nDx, .before = "nPx") |> 
+  relocate(idadeSimples, .before = "populacao")
   
 
 total<-
   dado |> 
-  group_by(regiao) |> 
-  summarise(numObitos = sum(numObitos),
-            numPopulacao = sum(numPopulacao)
+  group_by(populacao) |> 
+  summarise(nDx = sum(nDx),
+            nPx = sum(nPx)
             ) |> 
   mutate(idadeSimples = "Total") 
 
-# BASE COMPLETA (linhas TOTAL)
 
-dadoCompleto  <-   rbind(dado,total)
 
-# View(dadoCompleto)
+
+
+
+# BASE COMPLETA (linhas TOTAL) -----
+
+dadoCompleto  <-   
+  rbind(dado,total)
+
+
 
 
 # notNeed
@@ -159,4 +165,53 @@ rm(populacao)
 rm(total)
 rm(dado)
 
+#  PIVOTEAMENTO DOS DADOS -----
+
+dadosPivot <-
+
+dadoCompleto |> 
+  mutate( nMx = map2( .x = nDx, .y = nPx, .f = ~round(((.x/.y)), digits = 4) )  ) |> 
+  unnest(nMx) |> 
+  pivot_wider( names_from = populacao, values_from = nDx:nMx) |> 
+  rename(
+    'grupo' = 'idadeSimples',
+    
+    'nDxB' = 'nDx_Brazil',
+    'nDxT' = 'nDx_United Republic of Tanzania',
+    'nDxW' = 'nDx_WORLD',
+    
+    'nPxB' = 'nPx_Brazil',
+    'nPxT' = 'nPx_United Republic of Tanzania',
+    'nPxW' = 'nPx_WORLD',
+    
+    'nMxB' = 'nMx_Brazil',
+    'nMxT' = 'nMx_United Republic of Tanzania',
+    'nMxW' = 'nMx_WORLD',
+  ) |> 
+  select(
+    grupo, nDxB,nPxB,nMxB, nDxT,nPxT,nMxT, nDxW,nPxW,nMxW
+  ) |> 
+  mutate(
+    grupo =  factor(grupo,
+                           levels = c("0-1","1-4","5-9","10-14","15-19","20-24",
+                                      "25-29","30-34", "35-39","40-44","45-49",
+                                      "50-54","55-59","60-64","65-69","70-74",
+                                      "75-79","80-100","Total" ))
+    ) |> 
+  arrange(grupo)
+
+
+
+# População Total \bar{P}, P_barra
+ dadosPivot |>
+   filter( grupo %in% "Total") |> 
+   select(
+     starts_with("nPx")
+   )
+
+
+
+
+# .final
+rm(dadoCompleto)
 

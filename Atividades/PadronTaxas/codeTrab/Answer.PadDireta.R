@@ -8,54 +8,36 @@
 
 # cálculo da TBM e TEM e PADRONIZAÇÃO----
 
-tbemDado<-
-  dadoCompleto |> 
+dadoPadDireta <-
+  dadosPivot |> 
+  filter( ! grupo %in% 'Total') |> 
   mutate(
-    # TBM_TEM = map2( .x = numObitos, .y = numPopulacao, .f = ~((.x/.y)*1000) ) # TBM
-    TBM_TEM = map2( .x = numObitos, .y = numPopulacao, .f = ~((.x/.y)) ) # TEM
+    Bpadron = map2( .x = nMxB, .y = nPxW, .f = ~round(((.x*.y)/211782.9), digits = 4)  ),# P_bar_Brasil
+    Tpadron = map2( .x = nMxT, .y = nPxW, .f = ~round(((.x*.y)/59872.58), digits = 4)  )# P_bar_Tanzania
   ) |> 
-  unnest(TBM_TEM) |> 
-  pivot_wider( names_from = regiao, values_from = numObitos:TBM_TEM) |> 
-  select(
-    "idadeSimples","numPopulacao_WORLD","numObitos_WORLD","TBM_TEM_Brazil","TBM_TEM_United Republic of Tanzania","TBM_TEM_WORLD"
-  ) |> 
-  mutate(
-    idadeSimples =  factor(idadeSimples,
-                           levels = c("0-1","1-4","5-9","10-14","15-19","20-24",
-                                      "25-29","30-34", "35-39","40-44","45-49",
-                                      "50-54","55-59","60-64","65-69","70-74",
-                                      "75-79","80-100","Total"
-                           )
-    )
-  ) |> 
-  arrange(idadeSimples)
-
-tbemDado
-# .final
+  unnest(Bpadron, Tpadron)
 
 
 # PADRONIZAÇÃO DIRETA 
 
-"utilização da população mundial como padrão."
-# rm(dadoCompleto)
 
 
-dadoCalculado<-
-  tbemDado |> 
-  mutate(
-    padBrasil = map2( .x = tbemBrazil, .y = tbemWorld, 
-                      .f = ~((.x*.y))), # TEM BRAZIL * POPULAÇÃO MUNDIAL
-    
-    padTanzania = map2( .x = tbemTanzania, .y = tbemWorld, 
-                        .f = ~((.x*.y))) # TEM TANZANIA * POPULAÇÃO MUNDIAL 
-  
-  ) |>  unnest( c(padBrasil, padTanzania ) ) |> 
-  
-  filter(  !idadeSimples %in% "Total"  ) |>
-  select(idadeSimples, numPopulaWORLD, tbemWorld, padBrasil, padTanzania)   |> 
+sum(  dadoPadDireta[,"Bpadron"]   ) # 0.2541
+sum(  dadoPadDireta[,"Tpadron"]   ) # 1.4007
+
+
+# .final
+
+
+# GRAFICO ---
+
+
+  dadoPadDireta |> 
+    select(grupo, )
+
 
   pivot_longer(
-  # cols = -c(idadeSimples,numPopulaWORLD,tbemWorld),
+
   cols = -c(idadeSimples,numPopulaWORLD),
   names_to = "Pais", values_to = "nMxPad" ) |> 
 
