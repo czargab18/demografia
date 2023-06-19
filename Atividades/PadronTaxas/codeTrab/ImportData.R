@@ -201,7 +201,6 @@ dadoCompleto |>
   arrange(grupo)
 
 
-
 # População Total \bar{P}, P_barra
  dadosPivot |>
    filter( grupo %in% "Total") |> 

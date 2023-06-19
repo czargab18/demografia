@@ -5,7 +5,7 @@
 
 dadoPadIndireta<-
   dadosPivot |> 
-  filter( ! grupo %in% 'Total') |> 
+  # filter( ! grupo %in% 'Total') |> 
   mutate(
     Bnumer = map2( .x = nMxB, .y = nPxB, .f = ~round((.x*(.y/211782.9)), digits = 4)  ), # P_bar_Brasil
     Bdenom = map2( .x = nMxW, .y = nPxB, .f = ~round((.x*(.y/211782.9)), digits = 4)  ), # P_bar_Brasil
@@ -23,4 +23,13 @@ IpT = sum(  dadoPadIndireta[,"Tnumer"]   ) / sum(  dadoPadIndireta[,"Tdenom"]   
 
 
 # .final
+
+dadosPivot |> 
+  select(
+    grupo, nMxB,nMxT,nPxW
+  ) |> 
+  write.csv(file = "Atividades/PadronTaxas/dadosTratados/PadIndir.csv",row.names = FALSE)
+
+
+# |grupo|nMxB|nMxT|nPxW|
 
