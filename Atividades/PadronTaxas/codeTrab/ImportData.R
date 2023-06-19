@@ -200,6 +200,9 @@ dadoCompleto |>
     ) |> 
   arrange(grupo)
 
+write.csv(dadosPivot, file =  "Atividades/PadronTaxas/dadosTratados/dadoPivotComplet.csv",row.names =  FALSE)
+
+
 
 # População Total \bar{P}, P_barra
  dadosPivot |>
