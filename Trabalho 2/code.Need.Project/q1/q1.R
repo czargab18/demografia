@@ -18,20 +18,6 @@
 #   do Datasus para os anos censitários e projeções para os demais anos).
 #   Comente os resultados à luz da discussão sobre transição demográfica.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # b) Para todos os anos acima mencionados, calcule os indicadores de estrutura
 #    por idade (proporção de idosos (60 anos e mais), proporção de crianças
 #    (0 a 4 anos), proporção de jovens (0 a 14 anos), razão de dependência e
