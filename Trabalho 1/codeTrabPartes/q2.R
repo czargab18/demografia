@@ -261,7 +261,7 @@ rm(nascimentos)
 
 filhas<- 
   sinascdf |> 
-  filter(ano %in% c(2010, 2019, 2021)  & sexo %in% c(2, "F",)) |> 
+  filter(ano %in% c(2010, 2019, 2021)  & sexo %in% c(2, "F")) |> 
   mutate(
     idademae = as.numeric(as.character(idademae)),
     grupo_etario = cut(
@@ -327,9 +327,10 @@ TBR.2021
 TBR<-
   data.frame(
   ano = c(2010, 2019, 2021),
-  TFT = c(TBR.2010, TBR.2019, TBR.2021)
+  TBR = c(TBR.2010, TBR.2019, TBR.2021)
 )
 
+write.csv(x = TBR, file = "Trabalho 1/dadoTratado/q2/TBR.csv", row.names = FALSE)
 
 # Relação TBR e TFT feminina - RS0 - razão -sexo ano ----
 
@@ -360,11 +361,11 @@ rs0<-
   )
 
 # relação TBR e TFT Femina 
-TBR<-
+relacTBR.TFT<-
   TBR |> 
-  mutate( TFT = (TFT/(1+ rs0)))
+  mutate( relacao = (TFT/(1+ rs0)))
 
-write.csv(x = TBR, file = "Trabalho 1/dadoTratado/q2/TBR.csv", row.names = FALSE)
+write.csv(x = relacTBR.TFT, file = "Trabalho 1/dadoTratado/q2/relacTBR.TFT.csv", row.names = FALSE)
 
 
 
