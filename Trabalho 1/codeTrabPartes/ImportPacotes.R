@@ -45,11 +45,41 @@ dados |>
   imap(~ write.csv(.x, file = paste0("caminho/para/pasta/", sistemas[.y], ".csv"), row.names = FALSE))
 
 
+# correção dos dados
+
+simdf$dtnasc[
+  simdf$dtnasc %in% c("00001916", "10001950", "0001914", "00001922", "'11120001",
+                      "0151 927", "23061004")
+] <- c("03111916", "15061950", "22071914","16121922", "11041943","31031927",
+       "13061905")
+
+
+# BASE DE DADOS 
+
+sinascdf<-
+  readr::read_csv(file = "Trabalho 1/dataProject/SINASC.csv") |> 
+  janitor::clean_names() |> 
+  mutate(  dtnasc = lubridate::dmy(dtnasc),
+           ano = format(lubridate::dmy(dtnasc), "%Y")  )
+
+simdf<-
+  readr::read_csv(file = "Trabalho 1/dataProject/SIM-DO.csv") |> 
+  janitor::clean_names() |> 
+  mutate(
+    dtobito = lubridate::dmy(dtobito),
+    dtnasc = lubridate::dmy(
+      iconv(dtnasc, from = "UTF-8", to = "UTF-8" )   ),
+    ano = format(lubridate::dmy(dtobito), "%Y") 
+  )
+
+
 # População Projetada -------------------------------------------------------------------
 
 
 
 # "PROJEÇÕES POPULAÇÃO"
+
+library(readxl)
 
 url <- "https://ftp.ibge.gov.br/Projecao_da_Populacao/Projecao_da_Populacao_2018/projecoes_2018_populacao_2010_2060_20200406.xls"
 
@@ -113,7 +143,7 @@ popHom <-
 
 
 
-# TabuaVida ---------------------------------------------------------------
+# Tabua Vida ---------------------------------------------------------------
 
 
 url <- "https://unbbr-my.sharepoint.com/:x:/r/personal/211029058_aluno_unb_br/_layouts/15/Doc.aspx?sourcedoc=%7B3E1B5995-A3DE-45C5-842C-1B3AD4D2914B%7D&file=Tabuas_Mortalidade%202010-2060.xls&action=default&mobileredirect=true&DefaultItemOpen=1&login_hint=211029058%40aluno.unb.br&ct=1687812093347&wdOrigin=OFFICECOM-WEB.START.EDGEWORTH&cid=775c3831-e274-4fc2-9566-e0dc730c594d&wdPreviousSessionSrc=HarmonyWeb&wdPreviousSession=97bd440d-908a-4850-9121-4b8a5680f6aa"
@@ -188,65 +218,6 @@ TabVidaMasculina<-
 
 
 # .final
-
-
-
-#  code desnecessário  ------
-
-# Dados SINASC e SIM -------------------------------------------------------------------
-
-
-
-
-'IMPORTANDO SINASC'
-pf.sinasc<-fs::dir_ls("data.Need.Project/sinasc-dados/", glob = "*.DBC|*.dbc") |>
-  stringr::str_remove_all(pattern = ".DBC|.dbc") |>
-  stringr::str_c(pattern=".dbc")
-
-sinascdf<-
-  purrr::map2(
-    .x = pf.sinasc,
-    .y = 2000:2021,
-    .f = ~ read.dbc::read.dbc(.x) |>
-      # cria coluna ANO dentro de cada lista
-      dplyr::mutate(ano = .y),
-    .progress = TRUE
-  ) |>
-  dplyr::bind_rows() |>
-  janitor::clean_names()
-
-rm(pf.sinasc)
-
-'IMPORTANDO SIM'
-
-pf.sim<-fs::dir_ls("data.Need.Project/sim-dados/", glob = "*DOGO*.DBC|*DOGO*.dbc") |>
-  stringr::str_remove_all(pattern = ".DBC|.dbc") |>
-  stringr::str_c(pattern=".dbc")
-
-simdf<-
-  purrr::map2(
-    .x = pf.sim,
-    .y = 2000:2021,
-    .f = ~ read.dbc::read.dbc(.x) |> dplyr::mutate(ano = .y),
-    .progress = TRUE
-  ) |>
-  dplyr::bind_rows() |>
-  janitor::clean_names()
-
-rm(pf.sim)
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
