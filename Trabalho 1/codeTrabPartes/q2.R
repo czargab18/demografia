@@ -362,10 +362,11 @@ rs0<-
 
 # relação TBR e TFT Femina 
 relacTBR.TFT<-
-  TBR |> 
-  mutate( relacao = (TFT/(1+ rs0)))
+  TFT |> 
+  mutate( relacao = round((TFT/(1+ rs0)), digits = 2)) |> 
+  select(ano, relacao)
 
-write.csv(x = relacTBR.TFT, file = "Trabalho 1/dadoTratado/q2/relacTBR.TFT.csv", row.names = FALSE)
+write.csv(x = relacTBR.TFT, file = "Trabalho 1/dadoTratado/q2/relacTBReTFT.csv", row.names = FALSE)
 
 
 
