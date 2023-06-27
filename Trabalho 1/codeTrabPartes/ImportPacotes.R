@@ -179,7 +179,10 @@ TabVidaFeminina<-
     grupo_etario == "40"  ~ "40-44",
     grupo_etario == "45"  ~ "45-49",
     TRUE~grupo_etario
-  ))
+  )) |> 
+  filter(
+    !grupo_etario %in% c("Tábuas mulheres", "Ano:", "Idade")
+  )
 
 
 
@@ -212,9 +215,10 @@ TabVidaMasculina<-
     grupo_etario == "40"  ~ "40-44",
     grupo_etario == "45"  ~ "45-49",
     TRUE~grupo_etario
-  ))
-
-
+  )) |> 
+  filter(
+    !grupo_etario %in% c("Tábuas mulheres", "Ano:", "Idade")
+  )
 
 
 # .final
