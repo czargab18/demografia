@@ -110,6 +110,22 @@ plot.tfg.ano<-
 
 
 
+
+ggsave( plot = plot.tfg.ano, path = "Trabalho 1/figuras/graficos/", filename = "TFG.grafico.png",
+        dpi = 800,
+        width = 12,
+        height = 8,
+        units = "cm",
+        scale = 2 )
+
+
+
+
+
+
+
+
+
 rm(nascimentos)
 
 # code.Need.Q2B.TEF ------
@@ -180,7 +196,8 @@ plot.tef.ano<-
   labs(
     title = "Taxa de Especifica de Fecundidade de mulheres em idade Reprodutiva",
     x = "Grupos etários",
-    y = "Taxa de Especifica Fecundidade")
+    y = "Taxa de Especifica Fecundidade",
+    color = "ano")
   
 
 
