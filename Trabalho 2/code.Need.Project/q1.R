@@ -1,16 +1,19 @@
-"Aberto: terça-feira, 4 abr. 2023, 22:10"
-"Vencimento: segunda-feira, 10 jul. 2023, 23:59"
+'Aberto: terça-feira, 4 abr. 2023, 22:10'
+'Vencimento: segunda-feira, 10 jul. 2023, 23:59'
+
+library(dplyr)
+
 
 # Parte 1 - Estrutura Populacional e avaliação da informação sobre idade
 
 # data.Need.Q1 ----
 
-
-
 # a) Construa as pirâmides etárias por grupos de idade para a população da UF 
 #    escolhida em 1991, 2000, 2010, 2015, 2020 e 2030 (obtenha os dados no portal 
 #    do Datasus para os anos censitários e projeções para os demais anos).
 #    Comente os resultados à luz da discussão sobre transição demográfica.
+
+'anos cesitários :  1991, 2000, 2010 ||| projetar: 2020 e 2030'
 
 
 # answer.Q1A ---

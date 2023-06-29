@@ -211,6 +211,71 @@ ggsave( plot = plot.tef.ano, path = "Trabalho 1/figuras/graficos/", filename = "
 
 rm(plot.tef.ano)
 
+#  TAXA ESPECIFICA DE FECUNDIDADE FEMININA ------
+
+filhas<- 
+  sinascdf |> 
+  filter(ano %in% c(2010, 2019, 2021)  & sexo %in% c(2, "F")) |> 
+  mutate(
+    idademae = as.numeric(as.character(idademae)),
+    grupo_etario = cut(
+      idademae, c(15, 20, 25, 30, 35, 40, 45,50),
+      labels = c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49"),
+      include.lowest = TRUE)
+  ) |>
+  select(ano,grupo_etario) |> group_by() |> 
+  table() |> as.data.frame() |> arrange(ano) |> 
+  
+  relocate(grupo_etario, .before = "ano") |> 
+  rename(numero.filhas=Freq) 
+
+
+
+dado.tbr<-
+  merge(x = popMul,y = filhas,  by = c("grupo_etario","ano")) |>
+  mutate(
+    TEF=map2( .x = numero.filhas, .y = populacao,
+              
+              .f = ~((.x/.y))
+    )
+  ) |>
+  unnest(TEF)
+
+
+
+plot.tef.feminina.ano<-
+  ggplot(dado.tbr, aes(x = grupo_etario, y = TEF, color = as.factor(ano),group = ano)) +
+  geom_line(size = 1.5) +
+  geom_point(size = 3.5) +
+  scale_color_manual(values = c("#d8b365", "#ef8a62", "#5ab4ac")) +
+  # scale_y_log10()+
+  theme_minimal() +
+  theme(
+    panel.grid.major.x = element_line(size = .7, color = "grey"),
+    panel.grid.major.y = element_line(size = 0.5),
+    axis.text.x = element_text(size = 16),
+    axis.text.y = element_text(size = 16)
+  ) + 
+  labs(
+    title = "Taxa de Especifica de Fecundidade Feminina de mulheres em idade Reprodutiva",
+    x = "Grupos etários",
+    y = "Taxa de Especifica Fecundidade Feminina",
+    color = "ano")
+
+
+
+ggsave( plot = plot.tef.feminina.ano, path = "Trabalho 1/figuras/graficos/", filename = "TEF.feminina.grafico.png",
+        dpi = 800,
+        width = 12,
+        height = 8,
+        units = "cm",
+        scale = 2 )
+
+
+
+
+
+
 
 # code.Need.Q2A.TFT ----
 
