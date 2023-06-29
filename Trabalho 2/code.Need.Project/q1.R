@@ -1,7 +1,7 @@
 'Aberto: terça-feira, 4 abr. 2023, 22:10'
 'Vencimento: segunda-feira, 10 jul. 2023, 23:59'
 
-library(dplyr)
+library(ggplot2)
 
 
 # Parte 1 - Estrutura Populacional e avaliação da informação sobre idade
@@ -15,6 +15,15 @@ library(dplyr)
 
 'anos cesitários :  1991, 2000, 2010 ||| projetar: 2020 e 2030'
 
+ggplot(data = pop1991, mapping = aes(x = fxetaria, y = ifelse(sexo == '1', -populacao,populacao), fill = factor(sexo))) +
+  geom_bar(stat = 'identity')+
+  scale_y_continuous(labels = abs, limits = (max(pop1991$populacao))* c(-1,1)) +
+  coord_flip() +
+  labs(y = "Número de óbitos", x = "Faixa etária (em anos)",
+       fill = "Sexo",
+       title = "Óbitos segundo Sexo e Faixa etária, MRJ 2019",
+       caption= "Fonte: SIM, 2019")  # nomes dos eixos e legenda
+  
 
 # answer.Q1A ---
 
