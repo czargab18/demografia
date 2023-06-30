@@ -17,9 +17,9 @@ padrao1519 <- "^1[5-9]-1[5-9]"
 ordemetaria<-
   c("0-4","5-9","10-14","15-19", "20-24", "25-29", "30-34",
     "35-39","40-44","45-49","50-54","55-59","60-64","65-69",
-    "70-74","75-79","80-99")
+    "70-74","75-79","80+")
 
-
+rm(pop1991)
 
 # POPBR91   1991 - ESTIMATIVA ----
 pop1991<-
@@ -51,12 +51,19 @@ pop1991<-
     fxetaria %in% c("15-15","16-16", "17-17", "18-18", "19-19") ~ "15-19",
     str_detect(fxetaria, pattern = padrao1014) ~ "15-19",
     
+    # caso 80-99 anos
+    fxetaria %in% c("80-99") ~ "80+",
+    str_detect(fxetaria, pattern = padrao1014) ~ "80+",
+    
+    
     TRUE ~ fxetaria ),
-    fxetariav = factor(forcats::as_factor(fxetaria),  levels = ordemetaria)) |> 
+  #  reordenando os grupos etários
+    fxetaria = factor(forcats::as_factor(fxetaria),  levels = ordemetaria)) |> 
+  
+  
   group_by(sexo, fxetaria) |> 
   dplyr::summarise(populacao = sum(populacao)) |> 
   arrange(fxetaria)
-  
 
 
 
@@ -91,8 +98,16 @@ pop2000<-
     fxetaria %in% c("15-15","16-16", "17-17", "18-18", "19-19") ~ "15-19",
     str_detect(fxetaria, pattern = padrao1014) ~ "15-19",
     
+    # caso 80-99 anos
+    fxetaria %in% c("80-99") ~ "80+",
+    str_detect(fxetaria, pattern = padrao1014) ~ "80+",
+    
+    
     TRUE ~ fxetaria ),
-    fxetariav = factor(forcats::as_factor(fxetaria),  levels = ordemetaria)) |> 
+    #  reordenando os grupos etários
+    fxetaria = factor(forcats::as_factor(fxetaria),  levels = ordemetaria)) |> 
+  
+  
   group_by(sexo, fxetaria) |> 
   dplyr::summarise(populacao = sum(populacao)) |> 
   arrange(fxetaria)
@@ -129,8 +144,16 @@ pop2010<-
     fxetaria %in% c("15-15","16-16", "17-17", "18-18", "19-19") ~ "15-19",
     str_detect(fxetaria, pattern = padrao1014) ~ "15-19",
     
+    # caso 80-99 anos
+    fxetaria %in% c("80-99") ~ "80+",
+    str_detect(fxetaria, pattern = padrao1014) ~ "80+",
+    
+    
     TRUE ~ fxetaria ),
-    fxetariav = factor(forcats::as_factor(fxetaria),  levels = ordemetaria)) |> 
+    #  reordenando os grupos etários
+    fxetaria = factor(forcats::as_factor(fxetaria),  levels = ordemetaria)) |> 
+  
+  
   group_by(sexo, fxetaria) |> 
   dplyr::summarise(populacao = sum(populacao)) |> 
   arrange(fxetaria)
