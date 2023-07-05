@@ -3,7 +3,9 @@
 
 library(tidyverse)
 library(ggplot2)
-# library(rlang)
+library(scales)
+
+# NECESSÁRIO ----
 options(scipen = 99999)
 
 ordemetaria<-
@@ -20,6 +22,7 @@ ordemetaria<-
 #    do Datasus para os anos censitários e projeções para os demais anos).
 #    Comente os resultados à luz da discussão sobre transição demográfica.
 
+# anosCensitários DATASUS ----
 'anos cesitários :  1991, 2000, 2010 ||| projetar: 2020 e 2030'
 # graficos PirEtar - 1991 ----
 
@@ -46,12 +49,10 @@ pop1991
 ggplot(data = pop1991, mapping = aes(x = fxetaria)) +
   geom_bar(data = filter(pop1991, sexo == 1), aes(y = populacao, fill = sexo),
            stat = "identity") +
-
-
-  
   geom_bar(data = filter(pop1991, sexo == 2), aes(y = -populacao, fill= sexo),
            stat = "identity") +
-  scale_y_continuous(labels = abs) +
+  # scale_y_continuous(labels = abs) +
+  scale_y_continuous(labels = function(x){abs(x)/1000} ) +
   
   # girar gráfico 
   coord_flip() +
@@ -59,7 +60,7 @@ ggplot(data = pop1991, mapping = aes(x = fxetaria)) +
   scale_color_manual(
     values =  c('#343496','#f95d06'),aesthetics = 'fill',
     labels = c("Homens", "Mulheres")) +
-     
+  
   theme( 
       panel.grid.major.x = element_line(linewidth = 0.7, color = "gray"),
       panel.grid.major.y = element_line(linewidth = 0.5),
@@ -76,12 +77,6 @@ ggplot(data = pop1991, mapping = aes(x = fxetaria)) +
 
 
 # graficos PirEtar - 2000 ----
-options(scipen = 99999)
-
-ordemetaria<-
-  c("0-4","5-9","10-14","15-19", "20-24", "25-29", "30-34",
-    "35-39","40-44","45-49","50-54","55-59","60-64","65-69",
-    "70-74","75-79","80+")
 
 "GRAFICO 2000"
 
@@ -103,13 +98,13 @@ pop2000<-
 
 
 ggplot(data = pop2000, mapping = aes(x = fxetaria)) +
-  geom_bar(data = filter(pop2000, sexo == 2), aes(y = populacao,fill= sexo),
+  geom_bar(data = filter(pop2000, sexo == 1), aes(y = populacao,fill= sexo),
            stat = "identity") +
   
-  geom_bar(data = filter(pop2000, sexo == 1), aes(y = -populacao, fill= sexo),
+  geom_bar(data = filter(pop2000, sexo == 2), aes(y = -populacao, fill= sexo),
            stat = "identity") +
-  scale_y_continuous(labels = abs)+  # e options(scipen = 99999)
-  # scale_y_continuous(labels = comma(populacao, scientific=F))+
+  scale_y_continuous(labels = abs) +
+  
   
   # girar gráfico 
   coord_flip() +
@@ -119,7 +114,7 @@ ggplot(data = pop2000, mapping = aes(x = fxetaria)) +
     panel.grid.major.y = element_line(linewidth = 0.5),
     axis.text.x = element_text(size = 14),
     axis.text.y = element_text(size = 12)
-  )+
+  ) +
   
   scale_color_manual(
     values =  c('#343496','#f95d06'),aesthetics = 'fill',
@@ -134,12 +129,7 @@ ggplot(data = pop2000, mapping = aes(x = fxetaria)) +
   )
 
 # graficos PirEtar - 2010 ----
-options(scipen = 99999)
 
-ordemetaria<-
-  c("0-4","5-9","10-14","15-19", "20-24", "25-29", "30-34",
-    "35-39","40-44","45-49","50-54","55-59","60-64","65-69",
-    "70-74","75-79","80+")
 
 "GRAFICO 2010"
 
@@ -152,7 +142,8 @@ pop2010<-
       fxetaria %in% '1-4' ~ "0-4",
       TRUE~fxetaria
     ),
-    fxetaria = factor(forcats::as_factor(fxetaria),  levels = ordemetaria)
+    fxetaria = factor(forcats::as_factor(fxetaria),  levels = ordemetaria),
+    populacao = as.double(populacao)
   ) |> 
   dplyr::filter( !fxetaria %in% '9') |>  
   dplyr::group_by(sexo, fxetaria) |> 
@@ -168,7 +159,7 @@ ggplot(data = pop2010, mapping = aes(x = fxetaria)) +
   
   geom_bar(data = filter(pop2010, sexo == 2), aes(y = -populacao, fill= sexo),
            stat = "identity") +
-  scale_y_continuous(labels = abs)+
+  scale_y_continuous(labels = function(x){abs(x)/1000} ) +
   
   # girar gráfico 
   coord_flip() +
@@ -193,12 +184,9 @@ ggplot(data = pop2010, mapping = aes(x = fxetaria)) +
   )
 
 
-# .projeções IBGE ----
-library(tidyverse)
-library(ggplot2)
-# library(rlang)
-options(scipen = 99999)
 
+
+# .projeções IBGE ----
 # 2010.projecao ----
 
 popIBGE2010<-
@@ -214,7 +202,8 @@ popIBGE2010<-
       Idade %in% '90+' ~ "80+",
       TRUE~Idade
     ),
-    Idade = factor(forcats::as_factor(Idade),  levels = ordemetaria)
+    Idade = factor(forcats::as_factor(Idade),  levels = ordemetaria),
+    populacao = as.numeric(populacao)
     ) |> 
   dplyr::group_by(sexo, Idade) |> 
   dplyr::summarise(populacao = sum(as.numeric(populacao))) |> 
@@ -228,8 +217,9 @@ ggplot(data = popIBGE2010, mapping = aes(x = Idade))+
            stat = "identity") +
   geom_bar(data = filter(popIBGE2010, sexo == 'F'), aes(y = -populacao, fill= sexo),
            stat = "identity") +
-  
+  coord_cartesian(ylim = c(-300, 300)) +
   scale_y_continuous(labels = abs)+
+  # scale_y_continuous(labels = function(x){abs(x)/1000} ) +
   
   # girar gráfico 
   coord_flip() +
@@ -242,7 +232,7 @@ ggplot(data = popIBGE2010, mapping = aes(x = Idade))+
   )+
   
   scale_color_manual(
-    values =  c('#343496','#f95d06'),aesthetics = 'fill',
+    values =  c('#f95d06','#343496'),aesthetics = 'fill',
     labels = c("Homens", "Mulheres")) +
   
   labs(
@@ -268,7 +258,7 @@ popIBGE2015<-
       Idade %in% '90+' ~ "80+",
       TRUE~Idade
     ),
-    Idade = factor(forcats::as_factor(Idade),  levels = ordemetaria)
+    Idade = factor(forcats::as_factor(Idade),  levels = ordemetaria),
     ) |> 
   dplyr::group_by(sexo, Idade) |> 
   dplyr::summarise(populacao = sum(as.numeric(populacao))) |> 
@@ -282,8 +272,9 @@ ggplot(data = popIBGE2015, mapping = aes(x = Idade))+
            stat = "identity") +
   geom_bar(data = filter(popIBGE2015, sexo == 'F'), aes(y = -populacao, fill= sexo),
            stat = "identity") +
-  
-  scale_y_continuous(labels = abs)+
+  coord_cartesian(ylim = c(-300, 300))+  
+  scale_y_continuous(labels = abs) +
+  # scale_y_continuous(labels = function(x){abs(x)/1000} ) +
   
   # girar gráfico 
   coord_flip() +
@@ -336,8 +327,10 @@ ggplot(data = popIBGE2020, mapping = aes(x = Idade))+
            stat = "identity") +
   geom_bar(data = filter(popIBGE2020, sexo == 'F'), aes(y = -populacao, fill= sexo),
            stat = "identity") +
-  
-  scale_y_continuous(labels = abs)+
+
+  coord_cartesian(ylim = c(-300, 300))+  
+  scale_y_continuous(labels = abs) +
+  # scale_y_continuous(labels = function(x){abs(x)/1000} ) +
   
   # girar gráfico 
   coord_flip() +
@@ -410,36 +403,24 @@ ggplot(data = popIBGE2030, mapping = aes(x = Idade))+
     x = "Grupos Etários",
     y = "Distribuição da população \n (em milhares de pessoas)",
     fill = "Sexo",
-    title = "Pirâmide Etária de 2020, Goiás",
-    caption = "Fonte: projeção IBGE, 2020"
+    title = "Pirâmide Etária de 2030, Goiás",
+    caption = "Fonte: projeção IBGE, 2030"
   )
 
-# GGANIMATE  -----
+
+
 
 # Exportando os graficos  -----
 
+rm(pop1991)
+rm(pop2000)
+rm(pop2010) 
 
-# answer.Q1A ---
-
-# b) Para todos os anos acima mencionados, calcule os indicadores de estrutura 
-#    por idade (proporção de idosos (60 anos e mais), proporção de crianças
-#    (0 a 4 anos), proporção de jovens (0 a 14 anos), razão de dependência e 
-#    índice de envelhecimento). Calcule a idade média e a idade mediana.
-#    Calcule e grafique a razão de sexo por grupos de idade para 2000, 2010 e
-#    2030. Comente os resultados.
-
-
-
-# c) Avalie a qualidade da declaração de idade no Censo 2010 segundo forma de
-#    declaração (data de nascimento e idade presumida). Calcule os índices de
-#    Whipple, Myers e Bachi. Construa a pirâmide por idade simples. Comente os
-    # resultados. (utilize a planilha SINGAGE do PAS - disponível na plataforma)
-
-# Obtenha os dados na Tabela 3.2.1.2 do Censo 2010 - Resultados do Universo 
-# (https://www.ibge.gov.br/estatisticas/sociais/populacao/9662-censo-demografico-2010.html?edicao=10503&t=downloads)
+rm(popIBGE2010) 
+rm(popIBGE2015) 
+rm(popIBGE2020) 
+rm(popIBGE2030) 
 
 
 
 
-
-# .final
