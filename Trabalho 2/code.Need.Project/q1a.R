@@ -62,11 +62,11 @@ ggplot(data = pop1991, mapping = aes(x = fxetaria)) +
     labels = c("Homens", "Mulheres")) +
   
   theme( 
-      panel.grid.major.x = element_line(linewidth = 0.7, color = "gray"),
-      panel.grid.major.y = element_line(linewidth = 0.5),
-      axis.text.x = element_text(size = 14),
-      axis.text.y = element_text(size = 12)
-    ) +
+    panel.grid.major.x = element_line(linewidth = 0.7, color = "gray"),
+    panel.grid.major.y = element_line(linewidth = 0.5),
+    axis.text.x = element_text(size = 14),
+    axis.text.y = element_text(size = 12)
+  ) +
   labs(
     x = "Grupos Etários",
     y = "Distribuição da população \n (em milhares de pessoas)",
@@ -186,29 +186,10 @@ ggplot(data = pop2010, mapping = aes(x = fxetaria)) +
 
 
 
+
 # .projeções IBGE ----
+
 # 2010.projecao ----
-
-popIBGE2010<-
-  projecoesIBGE |> 
-  # dplyr::select( !4:6 )
-  dplyr::select( !(x2015:x2030) ) |>
-  dplyr::filter( ! grupo_etario %in% 'Total'  ) |> 
-  dplyr::rename( populacao = 'x2010', Idade ='grupo_etario' ) |> 
-  dplyr::mutate( 
-    Idade = dplyr::case_when(
-      Idade %in% '80-84' ~ "80+",
-      Idade %in% '85-89' ~ "80+",
-      Idade %in% '90+' ~ "80+",
-      TRUE~Idade
-    ),
-    Idade = factor(forcats::as_factor(Idade),  levels = ordemetaria),
-    populacao = as.numeric(populacao)
-    ) |> 
-  dplyr::group_by(sexo, Idade) |> 
-  dplyr::summarise(populacao = sum(as.numeric(populacao))) |> 
-  dplyr::arrange(sexo)
-
 
 #  GRÁFICO 
 
@@ -244,25 +225,6 @@ ggplot(data = popIBGE2010, mapping = aes(x = Idade))+
   )
 
 # 2015.projecao ----
-
-popIBGE2015<-
-  projecoesIBGE |> 
-  dplyr::select( sexo, grupo_etario, x2015 ) |> 
-  # dplyr::select( !c('x2010','x2020','x2030') ) |>
-  dplyr::filter( ! grupo_etario %in% 'Total'  ) |> 
-  dplyr::rename( populacao = 'x2015', Idade ='grupo_etario' ) |> 
-  dplyr::mutate( 
-    Idade = dplyr::case_when(
-      Idade %in% '80-84' ~ "80+",
-      Idade %in% '85-89' ~ "80+",
-      Idade %in% '90+' ~ "80+",
-      TRUE~Idade
-    ),
-    Idade = factor(forcats::as_factor(Idade),  levels = ordemetaria),
-    ) |> 
-  dplyr::group_by(sexo, Idade) |> 
-  dplyr::summarise(populacao = sum(as.numeric(populacao))) |> 
-  dplyr::arrange(sexo)
 
 
 #  GRÁFICO 
@@ -300,26 +262,6 @@ ggplot(data = popIBGE2015, mapping = aes(x = Idade))+
 
 # 2020.projecao ----
 
-popIBGE2020<-
-  projecoesIBGE |> 
-  dplyr::select( sexo, grupo_etario, x2020 ) |> 
-  # dplyr::select( !c('x2010','x2020','x2030') ) |>
-  dplyr::filter( ! grupo_etario %in% 'Total'  ) |> 
-  dplyr::rename( populacao = 'x2020', Idade ='grupo_etario' ) |> 
-  dplyr::mutate( 
-    Idade = dplyr::case_when(
-      Idade %in% '80-84' ~ "80+",
-      Idade %in% '85-89' ~ "80+",
-      Idade %in% '90+' ~ "80+",
-      TRUE~Idade
-    ),
-    Idade = factor(forcats::as_factor(Idade),  levels = ordemetaria)
-    ) |> 
-  dplyr::group_by(sexo, Idade) |> 
-  dplyr::summarise(populacao = sum(as.numeric(populacao))) |> 
-  dplyr::arrange(sexo)
-
-
 #  GRÁFICO 
 
 ggplot(data = popIBGE2020, mapping = aes(x = Idade))+
@@ -327,7 +269,7 @@ ggplot(data = popIBGE2020, mapping = aes(x = Idade))+
            stat = "identity") +
   geom_bar(data = filter(popIBGE2020, sexo == 'F'), aes(y = -populacao, fill= sexo),
            stat = "identity") +
-
+  
   coord_cartesian(ylim = c(-300, 300))+  
   scale_y_continuous(labels = abs) +
   # scale_y_continuous(labels = function(x){abs(x)/1000} ) +
@@ -355,25 +297,6 @@ ggplot(data = popIBGE2020, mapping = aes(x = Idade))+
   )
 
 # 2030.projecao ----
-
-popIBGE2030<-
-  projecoesIBGE |> 
-  dplyr::select( sexo, grupo_etario, x2030 ) |> 
-  dplyr::filter( ! grupo_etario %in% 'Total'  ) |> 
-  dplyr::rename( populacao = 'x2030', Idade ='grupo_etario' ) |> 
-  dplyr::mutate( 
-    Idade = dplyr::case_when(
-      Idade %in% '80-84' ~ "80+",
-      Idade %in% '85-89' ~ "80+",
-      Idade %in% '90+' ~ "80+",
-      TRUE~Idade
-    ),
-    Idade = factor(forcats::as_factor(Idade),  levels = ordemetaria)
-    ) |> 
-  dplyr::group_by(sexo, Idade) |> 
-  dplyr::summarise(populacao = sum(as.numeric(populacao))) |> 
-  dplyr::arrange(sexo)
-
 
 #  GRÁFICO 
 
@@ -412,14 +335,7 @@ ggplot(data = popIBGE2030, mapping = aes(x = Idade))+
 
 # Exportando os graficos  -----
 
-rm(pop1991)
-rm(pop2000)
-rm(pop2010) 
 
-rm(popIBGE2010) 
-rm(popIBGE2015) 
-rm(popIBGE2020) 
-rm(popIBGE2030) 
 
 
 

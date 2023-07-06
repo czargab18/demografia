@@ -142,7 +142,7 @@ rm(padrao1519)
 
 #   Com base nessas informações, construa e compare as pirâmides resultantes para 
 #   os anos de 2010, 2020 e 2060 para o Brasil.
-  
+
 #   Compare os resultados da projeção para a UF escolhida realizada no item (b)
 #   e a publicada pelo IBGE
 
