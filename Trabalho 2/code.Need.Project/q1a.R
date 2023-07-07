@@ -452,7 +452,7 @@ ggplot2::ggplot(data = popIBGE2030, mapping = aes(x = fxetaria)) +
 
 # .Export Plot 
 ggsave(
-  filename = 'PlotpopIBGE2020.png',
+  filename = 'PlotpopIBGE2030.png',
   plot = Plotpop2030IBGE,
   path = 'Trabalho 2/figuras/',
   scale = 1,
