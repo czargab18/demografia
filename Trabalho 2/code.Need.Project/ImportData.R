@@ -1,7 +1,7 @@
 # q1 -----
 
 # library(tidyverse)
-library(rlang)
+# library(rlang)
 library(foreign) # ler .dbf
 
 # Diretórios dos arquivos
@@ -53,7 +53,7 @@ pop1991<-
   dplyr::arrange(fxetaria)
 
 
-
+pop1991
 
 
 # POPBR00 2000 - DATASUS ----
@@ -90,7 +90,7 @@ pop2000<-
   dplyr::arrange(fxetaria)
 
 
-
+pop2000
 
 # POPTBR10.csv  2010 ----
 
@@ -102,11 +102,11 @@ pop2010<-
   dplyr::filter( 
     stringr::str_detect(fxetaria, pattern = padrao)) |> 
   dplyr::mutate(
-    fxetaria = map_chr(as.character(fxetaria), ~ if (nchar(.) == 4){ paste0(substr(., 1, 2), "-", substr(., 3, 4))} else {.})
+    fxetaria = purrr::map_chr(as.character(fxetaria), ~ if (nchar(.) == 4){ paste0(substr(., 1, 2), "-", substr(., 3, 4))} else {.})
   )|>
-  group_by(sexo, fxetaria) |> 
+  dplyr::group_by(sexo, fxetaria) |> 
   
-  mutate(fxetaria = case_when(
+  dplyr::mutate(fxetaria = dplyr::case_when(
     fxetaria %in% c("00-00", "01-01") ~ "0-1",
     
     fxetaria %in% c("01-01", "02-02", "03-03", "04-04") ~ "1-4",
@@ -123,12 +123,12 @@ pop2010<-
     fxetaria = factor(forcats::as_factor(fxetaria),  levels = ordemetaria)) |> 
   
   
-  group_by(sexo, fxetaria) |> 
+  dplyr::group_by(sexo, fxetaria) |> 
   dplyr::summarise(populacao = sum(populacao)) |> 
-  arrange(fxetaria)
+  dplyr::arrange(fxetaria)
 
 
-
+pop2010
 
 # projeçoesIBGE -----------------------------------------------------------
 rm(ordemetaria) # ordem etária é diferente nos 2 primeiros grupos
@@ -141,7 +141,19 @@ ordemetaria<-
 projecoesIBGE<-
   readxl::read_xlsx('Trabalho 2/dataProject/projecoesIBGE/GO-projecoesIBGE.xlsx') |> 
   dplyr::filter( !dplyr::row_number() %in% c(21,22)) |> 
-  janitor::clean_names()
+  janitor::clean_names() |>
+  
+  # AS COLUNAS SÃO IMPORTADAS COMO ( CARACTERES & PONTO )
+  #  AO CONVERTER PARA NUMERO, FICAM EM DECIMAL POR CAUSA DO PONTO
+    
+  dplyr::mutate(
+    x2010 = stringr::str_replace_all(x2010, pattern = '\\.', replace = ''),
+    x2015 = stringr::str_replace_all(x2015, pattern = '\\.', replace = ''),
+    x2020 = stringr::str_replace_all(x2020, pattern = '\\.', replace = ''),
+    x2030 = stringr::str_replace_all(x2030, pattern = '\\.', replace = '')
+  )
+
+projecoesIBGE
 
 # 2010.projecao ----
 
@@ -149,21 +161,23 @@ popIBGE2010<-
   projecoesIBGE |> 
   dplyr::select( !(x2015:x2030) ) |>
   dplyr::filter( ! grupo_etario %in% 'Total'  ) |> 
-  dplyr::rename( populacao = 'x2010', Idade ='grupo_etario' ) |> 
+  dplyr::rename( populacao = 'x2010', fxetaria ='grupo_etario' ) |> 
   dplyr::mutate( 
-    Idade = dplyr::case_when(
-      Idade %in% '80-84' ~ "80+",
-      Idade %in% '85-89' ~ "80+",
-      Idade %in% '90+' ~ "80+",
-      TRUE~Idade
+    fxetaria = dplyr::case_when(
+      fxetaria %in% '80-84' ~ "80+",
+      fxetaria %in% '85-89' ~ "80+",
+      fxetaria %in% '90+' ~ "80+",
+      TRUE~fxetaria
     ),
-    Idade = factor(forcats::as_factor(Idade),  levels = ordemetaria),
-    populacao = as.numeric(populacao)
+    fxetaria = factor(forcats::as_factor(fxetaria),  levels = ordemetaria)  ) |> 
+  dplyr::group_by(sexo, fxetaria) |> 
+  dplyr::summarise(populacao = sum(as.numeric(populacao)),.groups = "drop") |> 
+  dplyr::mutate(
+    populacao = abs(populacao)
   ) |> 
-  dplyr::group_by(sexo, Idade) |> 
-  dplyr::summarise(populacao = sum(as.numeric(populacao))) |> 
   dplyr::arrange(sexo)
 
+popIBGE2010
 # 2015.projecao ----
 
 popIBGE2015<-
@@ -171,71 +185,77 @@ popIBGE2015<-
   dplyr::select( sexo, grupo_etario, x2015 ) |> 
   # dplyr::select( !c('x2010','x2020','x2030') ) |>
   dplyr::filter( ! grupo_etario %in% 'Total'  ) |> 
-  dplyr::rename( populacao = 'x2015', Idade ='grupo_etario' ) |> 
+  dplyr::rename( populacao = 'x2015', fxetaria ='grupo_etario' ) |> 
   dplyr::mutate( 
-    Idade = dplyr::case_when(
-      Idade %in% '80-84' ~ "80+",
-      Idade %in% '85-89' ~ "80+",
-      Idade %in% '90+' ~ "80+",
-      TRUE~Idade
+    fxetaria = dplyr::case_when(
+      fxetaria %in% '80-84' ~ "80+",
+      fxetaria %in% '85-89' ~ "80+",
+      fxetaria %in% '90+' ~ "80+",
+      TRUE~fxetaria
     ),
-    Idade = factor(forcats::as_factor(Idade),  levels = ordemetaria),
+    fxetaria = factor(forcats::as_factor(fxetaria),  levels = ordemetaria),
   ) |> 
-  dplyr::group_by(sexo, Idade) |> 
+  dplyr::group_by(sexo, fxetaria) |> 
   dplyr::summarise(populacao = sum(as.numeric(populacao))) |> 
   dplyr::arrange(sexo)
 
+popIBGE2015
 # 2020.projecao ----
 
 popIBGE2020<-
   projecoesIBGE |> 
   dplyr::select( sexo, grupo_etario, x2020 ) |> 
   dplyr::filter( ! grupo_etario %in% 'Total'  ) |> 
-  dplyr::rename( populacao = 'x2020', Idade ='grupo_etario' ) |> 
+  dplyr::rename( populacao = 'x2020', fxetaria ='grupo_etario' ) |> 
   dplyr::mutate( 
-    Idade = dplyr::case_when(
-      Idade %in% '80-84' ~ "80+",
-      Idade %in% '85-89' ~ "80+",
-      Idade %in% '90+' ~ "80+",
-      TRUE~Idade
+    fxetaria = dplyr::case_when(
+      fxetaria %in% '80-84' ~ "80+",
+      fxetaria %in% '85-89' ~ "80+",
+      fxetaria %in% '90+' ~ "80+",
+      TRUE~fxetaria
     ),
-    Idade = factor(forcats::as_factor(Idade),  levels = ordemetaria)
+    fxetaria = factor(forcats::as_factor(fxetaria),  levels = ordemetaria)
   ) |> 
-  dplyr::group_by(sexo, Idade) |> 
+  dplyr::group_by(sexo, fxetaria) |> 
   dplyr::summarise(populacao = sum(as.numeric(populacao))) |> 
   dplyr::arrange(sexo)
 
+popIBGE2020
 # 2030.projecao ----
 
 popIBGE2030<-
   projecoesIBGE |> 
   dplyr::select( sexo, grupo_etario, x2030 ) |> 
   dplyr::filter( ! grupo_etario %in% 'Total'  ) |> 
-  dplyr::rename( populacao = 'x2030', Idade ='grupo_etario' ) |> 
+  dplyr::rename( populacao = 'x2030', fxetaria ='grupo_etario' ) |> 
   dplyr::mutate( 
-    Idade = dplyr::case_when(
-      Idade %in% '80-84' ~ "80+",
-      Idade %in% '85-89' ~ "80+",
-      Idade %in% '90+' ~ "80+",
-      TRUE~Idade
+    fxetaria = dplyr::case_when(
+      fxetaria %in% '80-84' ~ "80+",
+      fxetaria %in% '85-89' ~ "80+",
+      fxetaria %in% '90+' ~ "80+",
+      TRUE~fxetaria
     ),
-    Idade = factor(  forcats::as_factor(Idade),  levels = ordemetaria)  ) |> 
-  dplyr::group_by(sexo, Idade) |> 
-  dplyr::summarise(populacao = sum(as.numeric(populacao))) |> 
+    fxetaria = factor(  forcats::as_factor(fxetaria),  levels = ordemetaria)
+  ) |> 
+  dplyr::group_by(sexo, fxetaria) |> 
+  dplyr::summarise( populacao = sum(as.numeric(populacao))) |> 
   dplyr::arrange(sexo)
 
 
 
-
+popIBGE2030
 # desnecessário. ----
 rm(padrao)
 rm(ordemetaria)
 
-rm(pop1991)
-rm(pop2000)
-rm(pop2010) 
+# rm(pop1991)
+# rm(pop2000)
+# rm(pop2010) 
+# 
+# rm(popIBGE2010) 
+# rm(popIBGE2015) 
+# rm(popIBGE2020) 
+# rm(popIBGE2030) 
 
-rm(popIBGE2010) 
-rm(popIBGE2015) 
-rm(popIBGE2020) 
-rm(popIBGE2030) 
+# rm(PlotpopIBGE2030) 
+

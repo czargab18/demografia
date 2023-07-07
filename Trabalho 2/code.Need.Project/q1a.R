@@ -26,8 +26,6 @@ ordemetaria<-
 'anos cesitários :  1991, 2000, 2010 ||| projetar: 2020 e 2030'
 # graficos PirEtar - 1991 ----
 
-"GRAFICO 1991"
-
 pop1991<-
   pop1991 |>
   dplyr::group_by(sexo, fxetaria) |> 
@@ -46,22 +44,33 @@ pop1991<-
 
 pop1991
 
-ggplot(data = pop1991, mapping = aes(x = fxetaria)) +
-  geom_bar(data = filter(pop1991, sexo == 1), aes(y = populacao, fill = sexo),
-           stat = "identity") +
-  geom_bar(data = filter(pop1991, sexo == 2), aes(y = -populacao, fill= sexo),
-           stat = "identity") +
-  # scale_y_continuous(labels = abs) +
-  scale_y_continuous(labels = function(x){abs(x)/1000} ) +
+"GRAFICO 1991"
+
+Plotpop1991<-
+  ggplot2::ggplot(data = pop1991, mapping = aes(x = fxetaria)) +
+  ggplot2::geom_bar(
+    data = filter(pop1991, sexo == '2'),
+    aes(y = populacao, fill = sexo),  stat = "identity") +
+  ggplot2::geom_bar(
+    data = filter(pop1991, sexo == '1'),
+    aes(y = -populacao, fill= sexo), stat = "identity") +
+    
+    # ROTULOS (1 == HOMEM &&& 2 == MULHER)
+    scale_color_manual(
+      values =  c('#f95d06','#343496'),aesthetics = 'fill',
+      labels = c('Homens',"Mulheres")) + 
+
+  ggplot2::scale_y_continuous(
+    limits = c(-300000, 300000),
+    breaks = seq(-300000, 300000, 100000),
+    labels = function(x) {abs(x) / 1000}
+    ) +
   
   # girar gráfico 
-  coord_flip() +
+  ggplot2::coord_flip() +
   theme_minimal() +
-  scale_color_manual(
-    values =  c('#343496','#f95d06'),aesthetics = 'fill',
-    labels = c("Homens", "Mulheres")) +
   
-  theme( 
+  theme(
     panel.grid.major.x = element_line(linewidth = 0.7, color = "gray"),
     panel.grid.major.y = element_line(linewidth = 0.5),
     axis.text.x = element_text(size = 14),
@@ -74,6 +83,18 @@ ggplot(data = pop1991, mapping = aes(x = fxetaria)) +
     title = "Pirâmide Etária de 1991, Goiás",
     caption = "Fonte: Datasus, 1991"
   )
+
+# .Export Plot 
+ggsave(
+  filename = 'Plotpop1991.png',
+  plot = Plotpop1991,
+  path = 'Trabalho 2/figuras/',
+  scale = 1,
+  dpi = 300,
+  limitsize = TRUE,
+  bg = '#f5f5f7'
+)
+
 
 
 # graficos PirEtar - 2000 ----
@@ -97,29 +118,36 @@ pop2000<-
   dplyr::arrange(sexo)
 
 
-ggplot(data = pop2000, mapping = aes(x = fxetaria)) +
-  geom_bar(data = filter(pop2000, sexo == 1), aes(y = populacao,fill= sexo),
-           stat = "identity") +
+Plotpop2000<-
+  ggplot2::ggplot(data = pop2000, mapping = aes(x = fxetaria)) +
+  ggplot2::geom_bar(
+    data = filter(pop2000, sexo == '2'),
+    aes(y = populacao, fill = sexo),  stat = "identity") +
+  ggplot2::geom_bar(
+    data = filter(pop2000, sexo == '1'),
+    aes(y = -populacao, fill= sexo), stat = "identity") +
   
-  geom_bar(data = filter(pop2000, sexo == 2), aes(y = -populacao, fill= sexo),
-           stat = "identity") +
-  scale_y_continuous(labels = abs) +
+  # ROTULOS (1 == HOMEM &&& 2 == MULHER)
+  scale_color_manual(
+    values =  c('#f95d06','#343496'),aesthetics = 'fill',
+    labels = c('Homens',"Mulheres")) + 
   
+  ggplot2::scale_y_continuous(
+    limits = c(-300000, 300000),
+    breaks = seq(-300000, 300000, 100000),
+    labels = function(x) {abs(x) / 1000}
+  ) +
   
   # girar gráfico 
-  coord_flip() +
-  theme_minimal()+
-  theme( 
+  ggplot2::coord_flip() +
+  theme_minimal() +
+  
+  theme(
     panel.grid.major.x = element_line(linewidth = 0.7, color = "gray"),
     panel.grid.major.y = element_line(linewidth = 0.5),
     axis.text.x = element_text(size = 14),
     axis.text.y = element_text(size = 12)
   ) +
-  
-  scale_color_manual(
-    values =  c('#343496','#f95d06'),aesthetics = 'fill',
-    labels = c("Homens", "Mulheres")) +
-  
   labs(
     x = "Grupos Etários",
     y = "Distribuição da população \n (em milhares de pessoas)",
@@ -127,6 +155,17 @@ ggplot(data = pop2000, mapping = aes(x = fxetaria)) +
     title = "Pirâmide Etária de 2000, Goiás",
     caption = "Fonte: Datasus, 2000"
   )
+
+# .Export Plot 
+ggsave(
+  filename = 'Plotpop2000.png',
+  plot = Plotpop2000,
+  path = 'Trabalho 2/figuras/',
+  scale = 1,
+  dpi = 300,
+  limitsize = TRUE,
+  bg = '#f5f5f7'
+)
 
 # graficos PirEtar - 2010 ----
 
@@ -153,37 +192,55 @@ pop2010<-
 
 
 "GRAFICO 2010"
-ggplot(data = pop2010, mapping = aes(x = fxetaria)) +
-  geom_bar(data = filter(pop2010, sexo == 1), aes(y = populacao,fill= sexo),
-           stat = "identity") +
+
+Plotpop2010<-
+  ggplot2::ggplot(data = pop2010, mapping = aes(x = fxetaria)) +
+  ggplot2::geom_bar(
+    data = filter(pop2010, sexo == '2'),
+    aes(y = populacao, fill = sexo),  stat = "identity") +
+  ggplot2::geom_bar(
+    data = filter(pop2010, sexo == '1'),
+    aes(y = -populacao, fill= sexo), stat = "identity") +
   
-  geom_bar(data = filter(pop2010, sexo == 2), aes(y = -populacao, fill= sexo),
-           stat = "identity") +
-  scale_y_continuous(labels = function(x){abs(x)/1000} ) +
+  # ROTULOS (1 == HOMEM &&& 2 == MULHER)
+  scale_color_manual(
+    values =  c('#f95d06','#343496'),aesthetics = 'fill',
+    labels = c('Homens',"Mulheres")) + 
+  
+  ggplot2::scale_y_continuous(
+    limits = c(-300000, 300000),
+    breaks = seq(-300000, 300000, 100000),
+    labels = function(x) {abs(x) / 1000}
+  ) +
   
   # girar gráfico 
-  coord_flip() +
-  theme_minimal()+
-  theme( 
+  ggplot2::coord_flip() +
+  theme_minimal() +
+  
+  theme(
     panel.grid.major.x = element_line(linewidth = 0.7, color = "gray"),
     panel.grid.major.y = element_line(linewidth = 0.5),
     axis.text.x = element_text(size = 14),
     axis.text.y = element_text(size = 12)
-  )+
-  
-  scale_color_manual(
-    values =  c('#343496','#f95d06'),aesthetics = 'fill',
-    labels = c("Homens", "Mulheres")) +
-  
+  ) +
   labs(
     x = "Grupos Etários",
     y = "Distribuição da população \n (em milhares de pessoas)",
     fill = "Sexo",
     title = "Pirâmide Etária de 2010, Goiás",
-    caption = "Fonte: Datasus, 2010"
+    caption = "Fonte: DATASUS, 2010"
   )
 
-
+# .Export Plot 
+ggsave(
+  filename = 'Plotpop2010.png',
+  plot = Plotpop2010,
+  path = 'Trabalho 2/figuras/',
+  scale = 1,
+  dpi = 300,
+  limitsize = TRUE,
+  bg = '#f5f5f7'
+)
 
 
 
@@ -193,148 +250,216 @@ ggplot(data = pop2010, mapping = aes(x = fxetaria)) +
 
 #  GRÁFICO 
 
-ggplot(data = popIBGE2010, mapping = aes(x = Idade))+
-  geom_bar(data = filter(popIBGE2010, sexo == 'M'), aes(y = populacao, fill= sexo),
-           stat = "identity") +
-  geom_bar(data = filter(popIBGE2010, sexo == 'F'), aes(y = -populacao, fill= sexo),
-           stat = "identity") +
-  coord_cartesian(ylim = c(-300, 300)) +
-  scale_y_continuous(labels = abs)+
-  # scale_y_continuous(labels = function(x){abs(x)/1000} ) +
+
+PlotpopIBGE2010<-
+  ggplot2::ggplot(data = popIBGE2010, mapping = aes(x = fxetaria)) +
+  ggplot2::geom_bar(
+    data = filter(popIBGE2010, sexo == 'F'),
+    aes(y = populacao, fill = sexo),  stat = "identity") +
+  ggplot2::geom_bar(
+    data = filter(popIBGE2010, sexo == 'M'),
+    aes(y = -populacao, fill= sexo), stat = "identity") +
+  
+  scale_color_manual(
+    values =  c('#343496','#f95d06'),aesthetics = 'fill',
+    labels = c("Mulheres","Homens")) +
+
+  
+  ggplot2::scale_y_continuous(
+    limits = c(-300000, 300000),
+    breaks = seq(-300000, 300000, 100000),
+    labels = function(x) {abs(x) / 1000}
+  ) +
   
   # girar gráfico 
-  coord_flip() +
-  theme_minimal()+
-  theme( 
+  ggplot2::coord_flip() +
+  theme_minimal() +
+  
+  theme(
     panel.grid.major.x = element_line(linewidth = 0.7, color = "gray"),
     panel.grid.major.y = element_line(linewidth = 0.5),
     axis.text.x = element_text(size = 14),
     axis.text.y = element_text(size = 12)
-  )+
-  
-  scale_color_manual(
-    values =  c('#f95d06','#343496'),aesthetics = 'fill',
-    labels = c("Homens", "Mulheres")) +
-  
+  ) +
   labs(
     x = "Grupos Etários",
     y = "Distribuição da população \n (em milhares de pessoas)",
     fill = "Sexo",
     title = "Pirâmide Etária de 2010, Goiás",
-    caption = "Fonte: projeção IBGE, 2010"
+    caption = "Fonte: Projeção IBGE, 2010"
   )
+
+# .Export Plot 
+ggsave(
+  filename = 'PlotpopIBGE2010.png',
+  plot = PlotpopIBGE2010,
+  path = 'Trabalho 2/figuras/',
+  scale = 1,
+  dpi = 300,
+  limitsize = TRUE,
+  bg = '#f5f5f7'
+)
+
 
 # 2015.projecao ----
 
 
 #  GRÁFICO 
 
-ggplot(data = popIBGE2015, mapping = aes(x = Idade))+
-  geom_bar(data = filter(popIBGE2015, sexo == 'M'), aes(y = populacao, fill= sexo),
-           stat = "identity") +
-  geom_bar(data = filter(popIBGE2015, sexo == 'F'), aes(y = -populacao, fill= sexo),
-           stat = "identity") +
-  coord_cartesian(ylim = c(-300, 300))+  
-  scale_y_continuous(labels = abs) +
-  # scale_y_continuous(labels = function(x){abs(x)/1000} ) +
+Plotpop2015IBGE<-
+  ggplot2::ggplot(data = popIBGE2015, mapping = aes(x = fxetaria)) +
+  ggplot2::geom_bar(
+    data = filter(popIBGE2015, sexo == 'F'),
+    aes(y = populacao, fill = sexo),  stat = "identity") +
+  ggplot2::geom_bar(
+    data = filter(popIBGE2015, sexo == 'M'),
+    aes(y = -populacao, fill= sexo), stat = "identity") +
+  
+  scale_color_manual(
+    values =  c('#343496','#f95d06'),aesthetics = 'fill',
+    labels = c("Mulheres","Homens")) +
+  
+  
+  ggplot2::scale_y_continuous(
+    limits = c(-300000, 300000),
+    breaks = seq(-300000, 300000, 100000),
+    labels = function(x) {abs(x) / 1000}
+  ) +
   
   # girar gráfico 
-  coord_flip() +
-  theme_minimal()+
-  theme( 
+  ggplot2::coord_flip() +
+  theme_minimal() +
+  
+  theme(
     panel.grid.major.x = element_line(linewidth = 0.7, color = "gray"),
     panel.grid.major.y = element_line(linewidth = 0.5),
     axis.text.x = element_text(size = 14),
     axis.text.y = element_text(size = 12)
-  )+
-  
-  scale_color_manual(
-    values =  c('#343496','#f95d06'),aesthetics = 'fill',
-    labels = c("Homens", "Mulheres")) +
-  
+  ) +
   labs(
     x = "Grupos Etários",
     y = "Distribuição da população \n (em milhares de pessoas)",
     fill = "Sexo",
     title = "Pirâmide Etária de 2015, Goiás",
-    caption = "Fonte: projeção IBGE, 2015"
+    caption = "Fonte: Projeção IBGE, 2015"
   )
+
+# .Export Plot 
+ggsave(
+  filename = 'PlotpopIBGE2015.png',
+  plot = Plotpop2015IBGE,
+  path = 'Trabalho 2/figuras/',
+  scale = 1,
+  dpi = 300,
+  limitsize = TRUE,
+  bg = '#f5f5f7'
+)
 
 # 2020.projecao ----
 
 #  GRÁFICO 
 
-ggplot(data = popIBGE2020, mapping = aes(x = Idade))+
-  geom_bar(data = filter(popIBGE2020, sexo == 'M'), aes(y = populacao, fill= sexo),
-           stat = "identity") +
-  geom_bar(data = filter(popIBGE2020, sexo == 'F'), aes(y = -populacao, fill= sexo),
-           stat = "identity") +
+Plotpop2020IBGE<-
+  ggplot2::ggplot(data = popIBGE2020, mapping = aes(x = fxetaria)) +
+  ggplot2::geom_bar(
+    data = filter(popIBGE2020, sexo == 'F'),
+    aes(y = populacao, fill = sexo),  stat = "identity") +
+  ggplot2::geom_bar(
+    data = filter(popIBGE2020, sexo == 'M'),
+    aes(y = -populacao, fill= sexo), stat = "identity") +
   
-  coord_cartesian(ylim = c(-300, 300))+  
-  scale_y_continuous(labels = abs) +
-  # scale_y_continuous(labels = function(x){abs(x)/1000} ) +
+  scale_color_manual(
+    values =  c('#343496','#f95d06'),aesthetics = 'fill',
+    labels = c("Mulheres","Homens")) +
+  
+  
+  ggplot2::scale_y_continuous(
+    limits = c(-320000, 320000),
+    breaks = seq(-300000, 300000, 100000),
+    labels = function(x) {abs(x) / 1000}
+  ) +
   
   # girar gráfico 
-  coord_flip() +
-  theme_minimal()+
-  theme( 
+  ggplot2::coord_flip() +
+  theme_minimal() +
+  
+  theme(
     panel.grid.major.x = element_line(linewidth = 0.7, color = "gray"),
     panel.grid.major.y = element_line(linewidth = 0.5),
     axis.text.x = element_text(size = 14),
     axis.text.y = element_text(size = 12)
-  )+
-  
-  scale_color_manual(
-    values =  c('#343496','#f95d06'),aesthetics = 'fill',
-    labels = c("Homens", "Mulheres")) +
-  
+  ) +
   labs(
     x = "Grupos Etários",
     y = "Distribuição da população \n (em milhares de pessoas)",
     fill = "Sexo",
     title = "Pirâmide Etária de 2020, Goiás",
-    caption = "Fonte: projeção IBGE, 2020"
+    caption = "Fonte: Projeção IBGE, 2020"
   )
+
+# .Export Plot 
+ggsave(
+  filename = 'PlotpopIBGE2020.png',
+  plot = Plotpop2020IBGE,
+  path = 'Trabalho 2/figuras/',
+  scale = 1,
+  dpi = 300,
+  limitsize = TRUE,
+  bg = '#f5f5f7'
+)
 
 # 2030.projecao ----
 
 #  GRÁFICO 
 
-ggplot(data = popIBGE2030, mapping = aes(x = Idade))+
-  geom_bar(data = filter(popIBGE2030, sexo == 'M'), aes(y = populacao, fill= sexo),
-           stat = "identity") +
-  geom_bar(data = filter(popIBGE2030, sexo == 'F'), aes(y = -populacao, fill= sexo),
-           stat = "identity") +
+Plotpop2030IBGE<-
+ggplot2::ggplot(data = popIBGE2030, mapping = aes(x = fxetaria)) +
+  ggplot2::geom_bar(
+    data = filter(popIBGE2030, sexo == 'F'),
+    aes(y = populacao, fill = sexo),  stat = "identity") +
+  ggplot2::geom_bar(
+    data = filter(popIBGE2030, sexo == 'M'),
+    aes(y = -populacao, fill= sexo), stat = "identity") +
   
-  scale_y_continuous(labels = abs)+
+  scale_color_manual(
+    values =  c('#343496','#f95d06'),aesthetics = 'fill',
+    labels = c("Mulheres","Homens")) +
+  
+  
+  ggplot2::scale_y_continuous(
+    limits = c(-320000, 320000),
+    breaks = seq(-300000, 300000, 100000),
+    labels = function(x) {abs(x) / 1000}
+  ) +
   
   # girar gráfico 
-  coord_flip() +
-  theme_minimal()+
-  theme( 
+  ggplot2::coord_flip() +
+  theme_minimal() +
+  
+  theme(
     panel.grid.major.x = element_line(linewidth = 0.7, color = "gray"),
     panel.grid.major.y = element_line(linewidth = 0.5),
     axis.text.x = element_text(size = 14),
     axis.text.y = element_text(size = 12)
-  )+
-  
-  scale_color_manual(
-    values =  c('#343496','#f95d06'),aesthetics = 'fill',
-    labels = c("Homens", "Mulheres")) +
-  
+  ) +
   labs(
     x = "Grupos Etários",
     y = "Distribuição da população \n (em milhares de pessoas)",
     fill = "Sexo",
-    title = "Pirâmide Etária de 2030, Goiás",
-    caption = "Fonte: projeção IBGE, 2030"
+    title = "Pirâmide Etária de 2020, Goiás",
+    caption = "Fonte: Projeção IBGE, 2020"
   )
 
-
-
-
-# Exportando os graficos  -----
-
+# .Export Plot 
+ggsave(
+  filename = 'PlotpopIBGE2020.png',
+  plot = Plotpop2030IBGE,
+  path = 'Trabalho 2/figuras/',
+  scale = 1,
+  dpi = 300,
+  limitsize = TRUE,
+  bg = '#f5f5f7'
+)
 
 
 
