@@ -217,6 +217,7 @@
 
 
 
+
 # q1b popIBGE2010 ----
 'popIBGE2010 |> dplyr::filter(stringr::str_detect(Idade, pattern = "Total"))'
 
@@ -505,6 +506,7 @@
 
 
 
+
 # RSexo 2000, 2010, 2030 ----
 
 
@@ -569,11 +571,11 @@ RS.2030<-
   dplyr::arrange(sexo) |> 
   dplyr::ungroup() |>
   dplyr::mutate( 
-    Idade = dplyr::case_when( Idade %in% '0-1' ~ "0-4",
-                              Idade %in% '1-4' ~ "0-4", TRUE~Idade ),
-    Idade = factor(forcats::as_factor(Idade),  levels = ordemetaria)
+    fxetaria = dplyr::case_when( fxetaria %in% '0-1' ~ "0-4",
+                              fxetaria %in% '1-4' ~ "0-4", TRUE~fxetaria ),
+    fxetaria = factor(forcats::as_factor(fxetaria),  levels = ordemetaria)
   ) |> 
-  dplyr::group_by(sexo, Idade) |> 
+  dplyr::group_by(sexo, fxetaria) |> 
   dplyr::summarise(populacao = sum(as.numeric(populacao))) |> 
   tidyr::pivot_wider( # PIVOTEAMENTO
     names_from = sexo,
@@ -587,7 +589,7 @@ RS.2030<-
     Ano = 2000
   ) |> 
   unnest(RS) |> 
-  rename(fxetaria = Idade)
+  rename(fxetaria = fxetaria)
 
 # Completo.RS
 library(tidyverse)
@@ -609,9 +611,11 @@ Completo.RS<-
   dplyr::arrange(fxetaria)
 
 
+
 # Gráfico RS ----
 
-ggplot(data = Completo.RS, aes(x = fxetaria , y = RS, color = Ano,group = Ano) ) +
+PlotRS0porgrupo<-
+  ggplot(data = Completo.RS, aes(x = fxetaria , y = RS, color = Ano,group = Ano) ) +
   geom_point(size = 2) + 
   geom_line() +
   
@@ -623,10 +627,52 @@ ggplot(data = Completo.RS, aes(x = fxetaria , y = RS, color = Ano,group = Ano) )
   ) +
   
   labs(
-    x = "Anos",
-    y = "(%)",
-    title = "Razão de Sexo ao nascimento de 2000, 2010 e 2030, Goiás",
+    x = "Grupo Etário",
+    y = "Raza De Sexo",
+    title = "Goiás: Razão de sexo por grupo etário de 2000, 2010 e 2030",
     caption = "Fonte: DATASUS - 2000 e 2010 e projeção IBGE - 2030"
   )
 
+PlotRS0porgrupo
 
+ggsave(
+  filename = 'PlotRS0porgrupo.png',
+  plot = PlotRS0porgrupo,
+  path = 'Trabalho 2/figuras/',
+  scale = 1,
+  dpi = 300,
+  limitsize = TRUE,
+  bg = '#f5f5f7'
+)
+
+
+# desnecessário
+rm(RS.2030)
+rm(RS.2010)
+rm(RS.2030)
+rm(RS.2000)
+
+rm(Plotpop1991)
+rm(Plotpop2010)
+rm(Plotpop2000)
+
+rm(Plotpop2010IBGE)
+rm(Plotpop2015IBGE)
+rm(Plotpop2020IBGE)
+rm(Plotpop2030IBGE)
+
+rm(PlotRS0porgrupo)
+rm(PlotpopIBGE2010)
+rm(Completo.RS)
+
+rm(projecoesIBGE)
+rm(pop1991)
+rm(pop2000)
+rm(pop2010)
+
+rm(ordemetaria)
+
+rm(popIBGE2010)
+rm(popIBGE2015)
+rm(popIBGE2020)
+rm(popIBGE2030)

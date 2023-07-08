@@ -244,18 +244,12 @@ popIBGE2030<-
 
 
 popIBGE2030
+# Populacao ----
+readxl::read_xlsx(
+  'Trabalho 2/dataProject/projecoesIBGE/GO-projecoesIBGE.xlsx',
+  sheet = '2015'
+  )
+
 # desnecessário. ----
 rm(padrao)
 rm(ordemetaria)
-
-# rm(pop1991)
-# rm(pop2000)
-# rm(pop2010) 
-# 
-# rm(popIBGE2010) 
-# rm(popIBGE2015) 
-# rm(popIBGE2020) 
-# rm(popIBGE2030) 
-
-# rm(PlotpopIBGE2030) 
-
