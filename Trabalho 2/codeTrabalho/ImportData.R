@@ -140,17 +140,17 @@ ordemetaria<-
 
 projecoesIBGE<-
   readxl::read_xlsx('Trabalho 2/dataProject/projecoesIBGE/GO-projecoesIBGE.xlsx') |> 
-  dplyr::filter( !dplyr::row_number() %in% c(21,22)) |> 
+  # dplyr::filter( !dplyr::row_number() %in% c(21,22)) |> 
   janitor::clean_names() |>
   
   # AS COLUNAS SÃO IMPORTADAS COMO ( CARACTERES & PONTO )
   #  AO CONVERTER PARA NUMERO, FICAM EM DECIMAL POR CAUSA DO PONTO
     
   dplyr::mutate(
-    x2010 = stringr::str_replace_all(x2010, pattern = '\\.', replace = ''),
-    x2015 = stringr::str_replace_all(x2015, pattern = '\\.', replace = ''),
-    x2020 = stringr::str_replace_all(x2020, pattern = '\\.', replace = ''),
-    x2030 = stringr::str_replace_all(x2030, pattern = '\\.', replace = '')
+    x2010 = stringr::str_replace_all(x2010, pattern = ',', replace = ''),
+    x2015 = stringr::str_replace_all(x2015, pattern = ',', replace = ''),
+    x2020 = stringr::str_replace_all(x2020, pattern = ',', replace = ''),
+    x2030 = stringr::str_replace_all(x2030, pattern = ',', replace = '')
   )
 
 projecoesIBGE
@@ -244,12 +244,37 @@ popIBGE2030<-
 
 
 popIBGE2030
+
 # Populacao ----
-readxl::read_xlsx(
-  'Trabalho 2/dataProject/projecoesIBGE/GO-projecoesIBGE.xlsx',
-  sheet = '2015'
-  )
+praTabuaVida<-
+  readxl::read_xlsx('Trabalho 2/dataProject/projecoesIBGE/GO-projecoesIBGE.xlsx',
+                    sheet = '2015') |>
+  janitor::clean_names() |> 
+  
+  # AS COLUNAS SÃO IMPORTADAS COMO ( CARACTERES & PONTO )
+  #  AO CONVERTER PARA NUMERO, FICAM EM DECIMAL POR CAUSA DO PONTO
+  
+  dplyr::mutate(
+    x2014 = stringr::str_replace_all(x2014, pattern = '\\.', replace = ''),
+    x2015 = stringr::str_replace_all(x2015, pattern = '\\.', replace = ''),
+    x2016 = stringr::str_replace_all(x2016, pattern = '\\.', replace = ''),
+    
+    # CONVERTENDO PARA NUMERICO
+    x2014 = as.numeric(x2014),
+    x2015 = as.numeric(x2015),
+    x2016 = as.numeric(x2016)
+    
+  ) |> 
+  dplyr::rename('2014' = x2014, '2015' = x2015, '2016' = x2016) |> 
+  dplyr::filter( !dplyr::row_number() %in% 21:22)
+
 
 # desnecessário. ----
 rm(padrao)
 rm(ordemetaria)
+
+
+
+dadoq2c<-
+  readxl::read_xlsx('Trabalho 2/dataProject/q2c.xlsx')
+

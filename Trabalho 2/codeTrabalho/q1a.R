@@ -446,7 +446,7 @@ ggplot2::ggplot(data = popIBGE2030, mapping = aes(x = fxetaria)) +
     x = "Grupos Etários",
     y = "Distribuição da população \n (em milhares de pessoas)",
     fill = "Sexo",
-    title = "Pirâmide Etária de 2020, Goiás",
+    title = "Pirâmide Etária de 2030, Goiás",
     caption = "Fonte: Projeção IBGE, 2020"
   )
 
