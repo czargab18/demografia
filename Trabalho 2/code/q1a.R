@@ -434,6 +434,7 @@ Plotpop2020IBGE <-
     caption = "Fonte: Projeção IBGE, 2020"
   )
 
+Plotpop2020IBGE
 # .Export Plot
 ggsave(
   filename = "PlotpopIBGE2020.png",
@@ -447,7 +448,7 @@ ggsave(
 
 # 2030.projecao ----
 popIBGE2030<-
-popIBGE2020 |>
+popIBGE2030 |>
   dplyr::mutate(
     porcentagem = (populacao / sum(populacao)) * 100
   )
@@ -504,7 +505,8 @@ Plotpop2030IBGE <-
     title = "Pirâmide Etária de 2030, Goiás",
     caption = "Fonte: Projeção IBGE, 2020"
   )
-
+  
+Plotpop2030IBGE
 # .Export Plot
 ggsave(
   filename = "PlotpopIBGE2030.png",
