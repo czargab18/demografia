@@ -1,8 +1,7 @@
 # q1 -----
-
+# library(languageserver)
 # library(tidyverse)
 library(foreign) # ler .dbf
-# library(microdatasus)
 
 # Diretórios dos arquivos
 fs::dir_ls("data/T2/", glob = "*.DBF|*.dbf")
@@ -17,8 +16,6 @@ ordemetaria <-
     "35-39", "40-44", "45-49", "50-54", "55-59", "60-64", "65-69",
     "70-74", "75-79", "80+"
   )
-
-
 
 
 # POPBR91   1991 - DATASUS ----
@@ -138,11 +135,11 @@ pop2010
 rm(ordemetaria) # ordem etária é diferente nos 2 primeiros grupos
 
 ordemetaria <-
-  c(
-    "0-4", "5-9", "10-14", "15-19", "20-24", "25-29", "30-34",
-    "35-39", "40-44", "45-49", "50-54", "55-59", "60-64", "65-69",
-    "70-74", "75-79", "80+"
-  )
+c(
+  "0-4", "5-9", "10-14", "15-19", "20-24", "25-29", "30-34",
+  "35-39", "40-44", "45-49", "50-54", "55-59", "60-64", "65-69",
+  "70-74", "75-79", "80+"
+)
 
 projecoesIBGE <-
   readxl::read_xlsx("data/T2/GO-projecoesIBGE.xlsx") |>
@@ -165,7 +162,7 @@ popIBGE2015 <-
   projecoesIBGE |>
   dplyr::select(sexo, grupo_etario, x2015) |>
   # dplyr::select( !c('x2010','x2020','x2030') ) |>
-  dplyr::filter(!grupo_etario %in% c(NA,"Total", "GRUPO ETÁRIO")) |>
+  dplyr::filter(!grupo_etario %in% c(NA, "Total", "GRUPO ETÁRIO")) |>
   dplyr::rename(populacao = "x2015", fxetaria = "grupo_etario") |>
   dplyr::mutate(
     fxetaria = dplyr::case_when(
@@ -186,7 +183,7 @@ popIBGE2015
 popIBGE2020 <-
   projecoesIBGE |>
   dplyr::select(sexo, grupo_etario, x2020) |>
-  dplyr::filter(!grupo_etario %in% c(NA,"Total", "GRUPO ETÁRIO")) |>
+  dplyr::filter(!grupo_etario %in% c(NA, "Total", "GRUPO ETÁRIO")) |>
   dplyr::rename(populacao = "x2020", fxetaria = "grupo_etario") |>
   dplyr::mutate(
     fxetaria = dplyr::case_when(
@@ -207,7 +204,7 @@ popIBGE2020
 popIBGE2030 <-
   projecoesIBGE |>
   dplyr::select(sexo, grupo_etario, x2030) |>
-  dplyr::filter(!grupo_etario %in% c(NA,"Total", "GRUPO ETÁRIO")) |>
+  dplyr::filter(!grupo_etario %in% c(NA, "Total", "GRUPO ETÁRIO")) |>
   dplyr::rename(populacao = "x2030", fxetaria = "grupo_etario") |>
   dplyr::mutate(
     fxetaria = dplyr::case_when(
@@ -256,4 +253,15 @@ rm(ordemetaria)
 
 dadoq2c <-
   readxl::read_xlsx("Trabalho 2/dataProject/q2c.xlsx")
+
+
+
+
+
+
+
+
+
+
+
 

@@ -53,51 +53,35 @@ pop1991
 "GRAFICO 1991"
 
 Plotpop1991 <-
-  ggplot2::ggplot(data = pop1991, mapping = aes(x = fxetaria)) +
-  ggplot2::geom_bar(
-    data = filter(pop1991, sexo == "2"),
-    aes(y = populacao, fill = sexo), stat = "identity"
+  ggplot(data = pop1991, aes(x = fxetaria, y = ifelse(sexo == "1", porcentagem, -porcentagem), color = sexo)) +
+  geom_line(aes(group = sexo), position = position_dodge(width = 0.8), size = 1.5) +
+  scale_color_manual(values = c("#343496", "#f95d06"), labels = c("Mulheres", "Homens")) +
+  scale_y_continuous(
+    labels = function(x) paste(abs(x), "%"),
+    limits = c(-12, 15),
+    breaks = seq(-10, 10, 2)
   ) +
-  ggplot2::geom_bar(
-    data = filter(pop1991, sexo == "1"),
-    aes(y = -populacao, fill = sexo), stat = "identity"
-  ) +
-  #  PORCENTAGEM | DISTRIBUIÇÃO
-  geom_text(
-    data = filter(pop1991, sexo == "2"),
-    aes(y = populacao, label = paste(round(porcentagem, 2), "%")),
-    position = position_nudge(y = 30000), size = 5, vjust = 0
-  ) +
-  geom_text(
-    data = filter(pop1991, sexo == "1"),
-    aes(y = -populacao, label = paste(round(porcentagem, 2), "%")),
-    position = position_nudge(y = -30000), size = 5, vjust = 1
-  ) +
+  coord_flip() +
+  theme_minimal() +
   # ROTULOS (1 == HOMEM &&& 2 == MULHER)
   scale_color_manual(
     values = c("#f95d06", "#343496"), aesthetics = "fill",
     labels = c("Homens", "Mulheres")
   ) +
-  ggplot2::scale_y_continuous(
-    limits = c(-300000, 300000),
-    breaks = seq(-300000, 300000, 100000),
-    labels = function(x) {
-      abs(x) / 1000
-    }
-  ) +
-
+  geom_hline(yintercept = 0, color = "#6f5d5d", size = .5, linetype = "solid") +
   # girar gráfico
   ggplot2::coord_flip() +
   theme_minimal() +
   theme(
-    panel.grid.major.x = element_line(linewidth = 0.7, color = "gray"),
+    panel.grid.major.x = element_line(linewidth = 0.7, color = "#e5dfdf"),
     panel.grid.major.y = element_line(linewidth = 0.5),
     axis.text.x = element_text(size = 14),
-    axis.text.y = element_text(size = 12)
+    axis.text.y = element_text(size = 12),
+    legend.position = "bottom"
   ) +
   labs(
     x = "Grupos Etários",
-    y = "Distribuição da população \n (em milhares de pessoas)",
+    y = "Distribuição da população (em milhares de pessoas)",
     fill = "Sexo",
     title = "Pirâmide Etária de 1991, Goiás",
     caption = "Fonte: Datasus, 1991"
@@ -142,51 +126,35 @@ pop2000 <-
 pop2000
 
 Plotpop2000 <-
-  ggplot2::ggplot(data = pop2000, mapping = aes(x = fxetaria)) +
-  ggplot2::geom_bar(
-    data = filter(pop2000, sexo == "2"),
-    aes(y = populacao, fill = sexo), stat = "identity"
+  ggplot(data = pop2000, aes(x = fxetaria, y = ifelse(sexo == "1", porcentagem, -porcentagem), color = sexo)) +
+  geom_line(aes(group = sexo), position = position_dodge(width = 0.8), size = 1.5) +
+  scale_color_manual(values = c("#343496", "#f95d06"), labels = c("Mulheres", "Homens")) +
+  scale_y_continuous(
+    labels = function(x) paste(abs(x), "%"),
+    limits = c(-12, 15),
+    breaks = seq(-10, 10, 2)
   ) +
-  ggplot2::geom_bar(
-    data = filter(pop2000, sexo == "1"),
-    aes(y = -populacao, fill = sexo), stat = "identity"
-  ) +
-  #  PORCENTAGEM | DISTRIBUIÇÃO
-  geom_text(
-    data = filter(pop2000, sexo == "2"),
-    aes(y = populacao, label = paste(round(porcentagem, 2), "%")),
-    position = position_nudge(y = 30000), size = 4, vjust = 0
-  ) +
-  geom_text(
-    data = filter(pop2000, sexo == "1"),
-    aes(y = -populacao, label = paste(round(porcentagem, 2), "%")),
-    position = position_nudge(y = -30000), size = 4, vjust = 1
-  ) +
+  coord_flip() +
+  theme_minimal() +
   # ROTULOS (1 == HOMEM &&& 2 == MULHER)
   scale_color_manual(
     values = c("#f95d06", "#343496"), aesthetics = "fill",
     labels = c("Homens", "Mulheres")
   ) +
-  ggplot2::scale_y_continuous(
-    limits = c(-300000, 300000),
-    breaks = seq(-300000, 300000, 100000),
-    labels = function(x) {
-      abs(x) / 1000
-    }
-  ) +
-
+  geom_hline(yintercept = 0, color = "#6f5d5d", size = .5, linetype = "solid") +
   # girar gráfico
   ggplot2::coord_flip() +
   theme_minimal() +
   theme(
-    panel.grid.major.x = element_line(linewidth = 0.7, color = "gray"),
+    panel.grid.major.x = element_line(linewidth = 0.7, color = "#e5dfdf"),
     panel.grid.major.y = element_line(linewidth = 0.5),
     axis.text.x = element_text(size = 14),
-    axis.text.y = element_text(size = 12)
+    axis.text.y = element_text(size = 12),
+    legend.position = "bottom"
   ) +
   labs(
     x = "Grupos Etários",
-    y = "Distribuição da população \n (em milhares de pessoas)",
+    y = "Distribuição da população (em milhares de pessoas)",
     fill = "Sexo",
     title = "Pirâmide Etária de 2000, Goiás",
     caption = "Fonte: Datasus, 2000"
@@ -233,51 +201,35 @@ pop2010
 "GRAFICO 2010"
 
 Plotpop2010 <-
-  ggplot2::ggplot(data = pop2010, mapping = aes(x = fxetaria)) +
-  ggplot2::geom_bar(
-    data = filter(pop2010, sexo == "2"),
-    aes(y = populacao, fill = sexo), stat = "identity"
+  ggplot(data = pop2010, aes(x = fxetaria, y = ifelse(sexo == "1", porcentagem, -porcentagem), color = sexo)) +
+  geom_line(aes(group = sexo), position = position_dodge(width = 0.8), size = 1.5) +
+  scale_color_manual(values = c("#343496", "#f95d06"), labels = c("Mulheres", "Homens")) +
+  scale_y_continuous(
+    labels = function(x) paste(abs(x), "%"),
+    limits = c(-12, 15),
+    breaks = seq(-10, 10, 2)
   ) +
-  ggplot2::geom_bar(
-    data = filter(pop2010, sexo == "1"),
-    aes(y = -populacao, fill = sexo), stat = "identity"
-  ) +
-  #  PORCENTAGEM | DISTRIBUIÇÃO
-  geom_text(
-    data = filter(pop2010, sexo == "2"),
-    aes(y = populacao, label = paste(round(porcentagem, 2), "%")),
-    position = position_nudge(y = 20000), size = 4, vjust = 0
-  ) +
-  geom_text(
-    data = filter(pop2010, sexo == "1"),
-    aes(y = -populacao, label = paste(round(porcentagem, 2), "%")),
-    position = position_nudge(y = -20000), size = 4, vjust = 1
-  ) +
+  coord_flip() +
+  theme_minimal() +
   # ROTULOS (1 == HOMEM &&& 2 == MULHER)
   scale_color_manual(
     values = c("#f95d06", "#343496"), aesthetics = "fill",
     labels = c("Homens", "Mulheres")
   ) +
-  ggplot2::scale_y_continuous(
-    limits = c(-300000, 300000),
-    breaks = seq(-300000, 300000, 100000),
-    labels = function(x) {
-      abs(x) / 1000
-    }
-  ) +
-
+  geom_hline(yintercept = 0, color = "#6f5d5d", size = .5, linetype = "solid") +
   # girar gráfico
   ggplot2::coord_flip() +
   theme_minimal() +
   theme(
-    panel.grid.major.x = element_line(linewidth = 0.7, color = "gray"),
+    panel.grid.major.x = element_line(linewidth = 0.7, color = "#e5dfdf"),
     panel.grid.major.y = element_line(linewidth = 0.5),
     axis.text.x = element_text(size = 14),
-    axis.text.y = element_text(size = 12)
+    axis.text.y = element_text(size = 12),
+    legend.position = "bottom"
   ) +
   labs(
     x = "Grupos Etários",
-    y = "Distribuição da população \n (em milhares de pessoas)",
+    y = "Distribuição da população\n (em milhares de pessoas)",
     fill = "Sexo",
     title = "Pirâmide Etária de 2010, Goiás",
     caption = "Fonte: DATASUS, 2010"
@@ -309,52 +261,35 @@ popIBGE2015
 #  GRÁFICO
 
 Plotpop2015IBGE <-
-ggplot2::ggplot(data = popIBGE2015, mapping = aes(x = fxetaria)) +
-  ggplot2::geom_bar(
-    data = filter(popIBGE2015, sexo == "F"),
-    aes(y = populacao, fill = sexo), stat = "identity"
+  ggplot(data = popIBGE2015, aes(x = fxetaria, y = ifelse(sexo == "M", porcentagem, -porcentagem), color = sexo)) +
+  geom_line(aes(group = sexo), position = position_dodge(width = 0.8), size = 1.5) +
+  scale_color_manual(values = c("#343496", "#f95d06"), labels = c("Mulheres", "Homens")) +
+  scale_y_continuous(
+    labels = function(x) paste(abs(x), "%"),
+    limits = c(-12, 15),
+    breaks = seq(-10, 10, 2)
   ) +
-  ggplot2::geom_bar(
-    data = filter(popIBGE2015, sexo == "M"),
-    aes(y = -populacao, fill = sexo), stat = "identity"
-  ) +
-    #  PORCENTAGEM | DISTRIBUIÇÃO
-  geom_text(
-    data = filter(popIBGE2015, sexo == "F"),
-    aes(y = populacao, label = paste(round(porcentagem, 2), "%")),
-   position = position_stack(vjust = .9),  # Adjust the position inside the bar
-    size = 5, color = "#b4a59c"
-  ) +
-  geom_text(
-    data = filter(popIBGE2015, sexo == "M"),
-    aes(y = -populacao, label = paste(round(porcentagem, 2), "%")),
-   position = position_stack(vjust = .1),  # Adjust the position inside the bar
-    size = 5, color = "#272756"
-  ) +
+  coord_flip() +
+  theme_minimal() +
+  # ROTULOS (1 == HOMEM &&& 2 == MULHER)
   scale_color_manual(
-    values = c("#343496", "#f95d06"), aesthetics = "fill",
-    labels = c("Mulheres", "Homens")
+    values = c("#f95d06", "#343496"), aesthetics = "fill",
+    labels = c("Homens", "Mulheres")
   ) +
-  ggplot2::scale_y_continuous(
-    limits = c(-300000, 300000),
-    breaks = seq(-300000, 300000, 100000),
-    labels = function(x) {
-      abs(x) / 1000
-    }
-  ) +
-
+  geom_hline(yintercept = 0, color = "#6f5d5d", size = .5, linetype = "solid") +
   # girar gráfico
   ggplot2::coord_flip() +
   theme_minimal() +
   theme(
-    panel.grid.major.x = element_line(linewidth = 0.7, color = "gray"),
+    panel.grid.major.x = element_line(linewidth = 0.7, color = "#e5dfdf"),
     panel.grid.major.y = element_line(linewidth = 0.5),
     axis.text.x = element_text(size = 14),
-    axis.text.y = element_text(size = 12)
+    axis.text.y = element_text(size = 12),
+    legend.position = "bottom"
   ) +
   labs(
     x = "Grupos Etários",
-    y = "Distribuição da população \n (em milhares de pessoas)",
+    y = "Distribuição da população (em milhares de pessoas)",
     fill = "Sexo",
     title = "Pirâmide Etária de 2015, Goiás",
     caption = "Fonte: Projeção IBGE, 2015"
@@ -372,8 +307,8 @@ ggsave(
 )
 
 # 2020.projecao ----
-popIBGE2020<-
-popIBGE2020 |>
+popIBGE2020 <-
+  popIBGE2020 |>
   dplyr::mutate(
     porcentagem = (populacao / sum(populacao)) * 100
   )
@@ -382,53 +317,35 @@ popIBGE2020
 #  GRÁFICO
 
 Plotpop2020IBGE <-
-  ggplot2::ggplot(data = popIBGE2020, mapping = aes(x = fxetaria)) +
-  ggplot2::geom_bar(
-    data = filter(popIBGE2020, sexo == "F"),
-    aes(y = populacao, fill = sexo), stat = "identity"
+  ggplot(data = popIBGE2020, aes(x = fxetaria, y = ifelse(sexo == "M", porcentagem, -porcentagem), color = sexo)) +
+  geom_line(aes(group = sexo), position = position_dodge(width = 0.8), size = 1.5) +
+  scale_color_manual(values = c("#343496", "#f95d06"), labels = c("Mulheres", "Homens")) +
+  scale_y_continuous(
+    labels = function(x) paste(abs(x), "%"),
+    limits = c(-12, 15),
+    breaks = seq(-10, 10, 2)
   ) +
-  ggplot2::geom_bar(
-    data = filter(popIBGE2020, sexo == "M"),
-    aes(y = -populacao, fill = sexo), stat = "identity"
-  ) +
-      #  PORCENTAGEM | DISTRIBUIÇÃO
-  geom_text(
-    data = filter(popIBGE2020, sexo == "F"),
-    aes(y = populacao, label = paste(round(porcentagem, 2), "%")),
-   position = position_stack(vjust = .9),  # Adjust the position inside the bar
-    size = 5, color = "#b4a59c"
-  ) +
-  geom_text(
-    data = filter(popIBGE2020, sexo == "M"),
-    aes(y = -populacao, label = paste(round(porcentagem, 2), "%")),
-   position = position_stack(vjust = .1),  # Adjust the position inside the bar
-    size = 5, color = "#272756"
-  ) +
-
+  coord_flip() +
+  theme_minimal() +
+  # ROTULOS (1 == HOMEM &&& 2 == MULHER)
   scale_color_manual(
-    values = c("#343496", "#f95d06"), aesthetics = "fill",
-    labels = c("Mulheres", "Homens")
+    values = c("#f95d06", "#343496"), aesthetics = "fill",
+    labels = c("Homens", "Mulheres")
   ) +
-  ggplot2::scale_y_continuous(
-    limits = c(-320000, 320000),
-    breaks = seq(-300000, 300000, 100000),
-    labels = function(x) {
-      abs(x) / 1000
-    }
-  ) +
-
+  geom_hline(yintercept = 0, color = "#6f5d5d", size = .5, linetype = "solid") +
   # girar gráfico
   ggplot2::coord_flip() +
   theme_minimal() +
   theme(
-    panel.grid.major.x = element_line(linewidth = 0.7, color = "gray"),
+    panel.grid.major.x = element_line(linewidth = 0.7, color = "#e5dfdf"),
     panel.grid.major.y = element_line(linewidth = 0.5),
     axis.text.x = element_text(size = 14),
-    axis.text.y = element_text(size = 12)
+    axis.text.y = element_text(size = 12),
+    legend.position = "bottom"
   ) +
   labs(
     x = "Grupos Etários",
-    y = "Distribuição da população \n (em milhares de pessoas)",
+    y = "Distribuição da população (em milhares de pessoas)",
     fill = "Sexo",
     title = "Pirâmide Etária de 2020, Goiás",
     caption = "Fonte: Projeção IBGE, 2020"
@@ -447,65 +364,48 @@ ggsave(
 )
 
 # 2030.projecao ----
-popIBGE2030<-
-popIBGE2030 |>
+popIBGE2030 <-
+  popIBGE2030 |>
   dplyr::mutate(
     porcentagem = (populacao / sum(populacao)) * 100
   )
 #  GRÁFICO
 
 Plotpop2030IBGE <-
-  ggplot2::ggplot(data = popIBGE2030, mapping = aes(x = fxetaria)) +
-  ggplot2::geom_bar(
-    data = filter(popIBGE2030, sexo == "F"),
-    aes(y = populacao, fill = sexo), stat = "identity"
+  ggplot(data = popIBGE2030, aes(x = fxetaria, y = ifelse(sexo == "M", porcentagem, -porcentagem), color = sexo)) +
+  geom_line(aes(group = sexo), position = position_dodge(width = 0.8), size = 1.5) +
+  scale_color_manual(values = c("#343496", "#f95d06"), labels = c("Mulheres", "Homens")) +
+  scale_y_continuous(
+    labels = function(x) paste(abs(x), "%"),
+    limits = c(-12, 15),
+    breaks = seq(-10, 10, 2)
   ) +
-  ggplot2::geom_bar(
-    data = filter(popIBGE2030, sexo == "M"),
-    aes(y = -populacao, fill = sexo), stat = "identity"
-  ) +
-        #  PORCENTAGEM | DISTRIBUIÇÃO
-  geom_text(
-    data = filter(popIBGE2030, sexo == "F"),
-    aes(y = populacao, label = paste(round(porcentagem, 2), "%")),
-   position = position_stack(vjust = .9),  # Adjust the position inside the bar
-    size = 5, color = "#b4a59c"
-  ) +
-  geom_text(
-    data = filter(popIBGE2030, sexo == "M"),
-    aes(y = -populacao, label = paste(round(porcentagem, 2), "%")),
-   position = position_stack(vjust = .1),  # Adjust the position inside the bar
-    size = 5, color = "#272756"
-  ) +
+  coord_flip() +
+  theme_minimal() +
+  # ROTULOS (1 == HOMEM &&& 2 == MULHER)
   scale_color_manual(
-    values = c("#343496", "#f95d06"), aesthetics = "fill",
-    labels = c("Mulheres", "Homens")
+    values = c("#f95d06", "#343496"), aesthetics = "fill",
+    labels = c("Homens", "Mulheres")
   ) +
-  ggplot2::scale_y_continuous(
-    limits = c(-320000, 320000),
-    breaks = seq(-300000, 300000, 100000),
-    labels = function(x) {
-      abs(x) / 1000
-    }
-  ) +
-
+  geom_hline(yintercept = 0, color = "#6f5d5d", size = .5, linetype = "solid") +
   # girar gráfico
   ggplot2::coord_flip() +
   theme_minimal() +
   theme(
-    panel.grid.major.x = element_line(linewidth = 0.7, color = "gray"),
+    panel.grid.major.x = element_line(linewidth = 0.7, color = "#e5dfdf"),
     panel.grid.major.y = element_line(linewidth = 0.5),
     axis.text.x = element_text(size = 14),
-    axis.text.y = element_text(size = 12)
+    axis.text.y = element_text(size = 12),
+    legend.position = "bottom"
   ) +
   labs(
     x = "Grupos Etários",
-    y = "Distribuição da população \n (em milhares de pessoas)",
+    y = "Distribuição da população (em milhares de pessoas)",
     fill = "Sexo",
     title = "Pirâmide Etária de 2030, Goiás",
     caption = "Fonte: Projeção IBGE, 2020"
   )
-  
+
 Plotpop2030IBGE
 # .Export Plot
 ggsave(
@@ -517,3 +417,14 @@ ggsave(
   limitsize = TRUE,
   bg = "#f5f5f7"
 )
+
+
+# Comente os resultados à luz da discussão
+# sobre transição demográfica.
+Plotpop1991
+Plotpop2000
+Plotpop2010
+
+Plotpop2015IBGE
+Plotpop2020IBGE
+Plotpop2030IBGE

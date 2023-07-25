@@ -11,7 +11,6 @@
 # q1b pop1991 ----
 # - proporção de idosos (60 anos e mais)
 
-
 (
   pop1991 |> 
     dplyr::filter(
