@@ -253,15 +253,3 @@ rm(ordemetaria)
 
 dadoq2c <-
   readxl::read_xlsx("Trabalho 2/dataProject/q2c.xlsx")
-
-
-
-
-
-
-
-
-
-
-
-

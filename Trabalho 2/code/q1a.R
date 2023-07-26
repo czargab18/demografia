@@ -22,7 +22,7 @@ ordemetaria <-
 
 # a) Construa as pirâmides etárias por grupos de idade para a população da UF
 #    escolhida em 1991, 2000, 2010, 2015, 2020 e 2030 (obtenha os dados no portal
-#    do Datasus para os anos censitários e projeções para os demais anos).
+#    do DATASUS para os anos censitários e projeções para os demais anos).
 #    Comente os resultados à luz da discussão sobre transição demográfica.
 
 # anosCensitários DATASUS ----
@@ -53,19 +53,33 @@ pop1991
 "GRAFICO 1991"
 
 Plotpop1991 <-
-  ggplot(data = pop1991, aes(x = fxetaria, y = ifelse(sexo == "1", porcentagem, -porcentagem), color = sexo)) +
-  geom_line(aes(group = sexo), position = position_dodge(width = 0.8), size = 1.5) +
-  scale_color_manual(values = c("#343496", "#f95d06"), labels = c("Mulheres", "Homens")) +
-  scale_y_continuous(
-    labels = function(x) paste(abs(x), "%"),
-    limits = c(-12, 15),
-    breaks = seq(-10, 10, 2)
+  ggplot(
+    data = pop1991,
+    aes(x = fxetaria, group = sexo, color = sexo)
+  ) +
+  geom_line(
+    data = dplyr::filter(pop1991, sexo == "1"),
+    aes(y = porcentagem),
+    position = position_dodge(width = 0.8),
+    size = 1.5,
+  ) +
+  geom_line(
+    data = dplyr::filter(pop1991, sexo == "2"),
+    aes(y = -porcentagem),
+    position = position_dodge(width = 0.8),
+    size = 1.5,
   ) +
   coord_flip() +
+  scale_y_continuous(
+    labels = function(x) paste(abs(x), "%"),
+    limits = c(-12, 12),
+    breaks = seq(-10, 10, 2)
+  ) +
   theme_minimal() +
   # ROTULOS (1 == HOMEM &&& 2 == MULHER)
   scale_color_manual(
-    values = c("#f95d06", "#343496"), aesthetics = "fill",
+    values = c("#f95d06", "#343496"),
+    aesthetics = "color",
     labels = c("Homens", "Mulheres")
   ) +
   geom_hline(yintercept = 0, color = "#6f5d5d", size = .5, linetype = "solid") +
@@ -73,18 +87,26 @@ Plotpop1991 <-
   ggplot2::coord_flip() +
   theme_minimal() +
   theme(
+    # panel.background = element_rect(color = "#f5f5f7", fill = "#f5f5f7"),
+    plot.title = element_text(size = 20, face = "bold"),
     panel.grid.major.x = element_line(linewidth = 0.7, color = "#e5dfdf"),
     panel.grid.major.y = element_line(linewidth = 0.5),
-    axis.text.x = element_text(size = 14),
-    axis.text.y = element_text(size = 12),
-    legend.position = "bottom"
+    axis.text.x = element_text(size = 14, face = "plain"),
+    axis.text.y = element_text(size = 14, face = "plain"),
+    axis.title.x = element_text(size = 16, face = "bold"),
+    axis.title.y = element_text(size = 16, face = "bold"),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 16),
+    legend.position = "bottom",
+    plot.caption = element_text(size = 12, hjust = 0),
+    plot.margin = margin(t = 10, r = 20, b = 20, l = 10)
   ) +
   labs(
     x = "Grupos Etários",
     y = "Distribuição da população (em milhares de pessoas)",
-    fill = "Sexo",
-    title = "Pirâmide Etária de 1991, Goiás",
-    caption = "Fonte: Datasus, 1991"
+    # color = "Sexo",
+    title = "Pirâmide Etária do Censo de 1991, Goiás",
+    caption = "Fonte: DATASUS, 1991"
   )
 
 # .Export Plot
@@ -126,19 +148,33 @@ pop2000 <-
 pop2000
 
 Plotpop2000 <-
-  ggplot(data = pop2000, aes(x = fxetaria, y = ifelse(sexo == "1", porcentagem, -porcentagem), color = sexo)) +
-  geom_line(aes(group = sexo), position = position_dodge(width = 0.8), size = 1.5) +
-  scale_color_manual(values = c("#343496", "#f95d06"), labels = c("Mulheres", "Homens")) +
-  scale_y_continuous(
-    labels = function(x) paste(abs(x), "%"),
-    limits = c(-12, 15),
-    breaks = seq(-10, 10, 2)
+  ggplot(
+    data = pop2000,
+    aes(x = fxetaria, group = sexo, color = sexo)
+  ) +
+  geom_line(
+    data = dplyr::filter(pop2000, sexo == "1"),
+    aes(y = porcentagem),
+    position = position_dodge(width = 0.8),
+    size = 1.5,
+  ) +
+  geom_line(
+    data = dplyr::filter(pop2000, sexo == "2"),
+    aes(y = -porcentagem),
+    position = position_dodge(width = 0.8),
+    size = 1.5,
   ) +
   coord_flip() +
+  scale_y_continuous(
+    labels = function(x) paste(abs(x), "%"),
+    limits = c(-12, 12),
+    breaks = seq(-10, 10, 2)
+  ) +
   theme_minimal() +
   # ROTULOS (1 == HOMEM &&& 2 == MULHER)
   scale_color_manual(
-    values = c("#f95d06", "#343496"), aesthetics = "fill",
+    values = c("#f95d06", "#343496"),
+    aesthetics = "color",
     labels = c("Homens", "Mulheres")
   ) +
   geom_hline(yintercept = 0, color = "#6f5d5d", size = .5, linetype = "solid") +
@@ -146,18 +182,26 @@ Plotpop2000 <-
   ggplot2::coord_flip() +
   theme_minimal() +
   theme(
+    # panel.background = element_rect(color = "#f5f5f7", fill = "#f5f5f7"),
+    plot.title = element_text(size = 20, face = "bold"),
     panel.grid.major.x = element_line(linewidth = 0.7, color = "#e5dfdf"),
     panel.grid.major.y = element_line(linewidth = 0.5),
-    axis.text.x = element_text(size = 14),
-    axis.text.y = element_text(size = 12),
-    legend.position = "bottom"
+    axis.text.x = element_text(size = 14, face = "plain"),
+    axis.text.y = element_text(size = 14, face = "plain"),
+    axis.title.x = element_text(size = 16, face = "bold"),
+    axis.title.y = element_text(size = 16, face = "bold"),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 16),
+    legend.position = "bottom",
+    plot.caption = element_text(size = 12, hjust = 0),
+    plot.margin = margin(t = 10, r = 20, b = 20, l = 10)
   ) +
   labs(
     x = "Grupos Etários",
     y = "Distribuição da população (em milhares de pessoas)",
     fill = "Sexo",
     title = "Pirâmide Etária de 2000, Goiás",
-    caption = "Fonte: Datasus, 2000"
+    caption = "Fonte: DATASUS, 2000"
   )
 
 # .Export Plot
@@ -201,19 +245,33 @@ pop2010
 "GRAFICO 2010"
 
 Plotpop2010 <-
-  ggplot(data = pop2010, aes(x = fxetaria, y = ifelse(sexo == "1", porcentagem, -porcentagem), color = sexo)) +
-  geom_line(aes(group = sexo), position = position_dodge(width = 0.8), size = 1.5) +
-  scale_color_manual(values = c("#343496", "#f95d06"), labels = c("Mulheres", "Homens")) +
-  scale_y_continuous(
-    labels = function(x) paste(abs(x), "%"),
-    limits = c(-12, 15),
-    breaks = seq(-10, 10, 2)
+  ggplot(
+    data = pop2010,
+    aes(x = fxetaria, group = sexo, color = sexo)
+  ) +
+  geom_line(
+    data = dplyr::filter(pop2010, sexo == "1"),
+    aes(y = porcentagem),
+    position = position_dodge(width = 0.8),
+    size = 1.5,
+  ) +
+  geom_line(
+    data = dplyr::filter(pop2010, sexo == "2"),
+    aes(y = -porcentagem),
+    position = position_dodge(width = 0.8),
+    size = 1.5,
   ) +
   coord_flip() +
+  scale_y_continuous(
+    labels = function(x) paste(abs(x), "%"),
+    limits = c(-12, 12),
+    breaks = seq(-10, 10, 2)
+  ) +
   theme_minimal() +
   # ROTULOS (1 == HOMEM &&& 2 == MULHER)
   scale_color_manual(
-    values = c("#f95d06", "#343496"), aesthetics = "fill",
+    values = c("#f95d06", "#343496"),
+    aesthetics = "color",
     labels = c("Homens", "Mulheres")
   ) +
   geom_hline(yintercept = 0, color = "#6f5d5d", size = .5, linetype = "solid") +
@@ -221,11 +279,19 @@ Plotpop2010 <-
   ggplot2::coord_flip() +
   theme_minimal() +
   theme(
+    # panel.background = element_rect(color = "#f5f5f7", fill = "#f5f5f7"),
+    plot.title = element_text(size = 20, face = "bold"),
     panel.grid.major.x = element_line(linewidth = 0.7, color = "#e5dfdf"),
     panel.grid.major.y = element_line(linewidth = 0.5),
-    axis.text.x = element_text(size = 14),
-    axis.text.y = element_text(size = 12),
-    legend.position = "bottom"
+    axis.text.x = element_text(size = 14, face = "plain"),
+    axis.text.y = element_text(size = 14, face = "plain"),
+    axis.title.x = element_text(size = 16, face = "bold"),
+    axis.title.y = element_text(size = 16, face = "bold"),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 16),
+    legend.position = "bottom",
+    plot.caption = element_text(size = 12, hjust = 0),
+    plot.margin = margin(t = 10, r = 20, b = 20, l = 10)
   ) +
   labs(
     x = "Grupos Etários",
@@ -261,19 +327,33 @@ popIBGE2015
 #  GRÁFICO
 
 Plotpop2015IBGE <-
-  ggplot(data = popIBGE2015, aes(x = fxetaria, y = ifelse(sexo == "M", porcentagem, -porcentagem), color = sexo)) +
-  geom_line(aes(group = sexo), position = position_dodge(width = 0.8), size = 1.5) +
-  scale_color_manual(values = c("#343496", "#f95d06"), labels = c("Mulheres", "Homens")) +
-  scale_y_continuous(
-    labels = function(x) paste(abs(x), "%"),
-    limits = c(-12, 15),
-    breaks = seq(-10, 10, 2)
+  ggplot(
+    data = popIBGE2015,
+    aes(x = fxetaria, group = sexo, color = sexo)
+  ) +
+  geom_line(
+    data = dplyr::filter(popIBGE2015, sexo == "M"),
+    aes(y = porcentagem),
+    position = position_dodge(width = 0.8),
+    size = 1.5,
+  ) +
+  geom_line(
+    data = dplyr::filter(popIBGE2015, sexo == "F"),
+    aes(y = -porcentagem),
+    position = position_dodge(width = 0.8),
+    size = 1.5,
   ) +
   coord_flip() +
+  scale_y_continuous(
+    labels = function(x) paste(abs(x), "%"),
+    limits = c(-10, 10),
+    breaks = seq(-10, 10, 2)
+  ) +
   theme_minimal() +
   # ROTULOS (1 == HOMEM &&& 2 == MULHER)
   scale_color_manual(
-    values = c("#f95d06", "#343496"), aesthetics = "fill",
+    values = c("#f95d06", "#343496"),
+    aesthetics = "color",
     labels = c("Homens", "Mulheres")
   ) +
   geom_hline(yintercept = 0, color = "#6f5d5d", size = .5, linetype = "solid") +
@@ -281,11 +361,19 @@ Plotpop2015IBGE <-
   ggplot2::coord_flip() +
   theme_minimal() +
   theme(
+    # panel.background = element_rect(color = "#f5f5f7", fill = "#f5f5f7"),
+    plot.title = element_text(size = 20, face = "bold"),
     panel.grid.major.x = element_line(linewidth = 0.7, color = "#e5dfdf"),
     panel.grid.major.y = element_line(linewidth = 0.5),
-    axis.text.x = element_text(size = 14),
-    axis.text.y = element_text(size = 12),
-    legend.position = "bottom"
+    axis.text.x = element_text(size = 14, face = "plain"),
+    axis.text.y = element_text(size = 14, face = "plain"),
+    axis.title.x = element_text(size = 16, face = "bold"),
+    axis.title.y = element_text(size = 16, face = "bold"),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 16),
+    legend.position = "bottom",
+    plot.caption = element_text(size = 12, hjust = 0),
+    plot.margin = margin(t = 10, r = 20, b = 20, l = 10)
   ) +
   labs(
     x = "Grupos Etários",
@@ -303,7 +391,7 @@ ggsave(
   scale = 1,
   dpi = 300,
   limitsize = TRUE,
-  bg = "#f5f5f7"
+  # bg = "#f5f5f7"
 )
 
 # 2020.projecao ----
@@ -317,19 +405,33 @@ popIBGE2020
 #  GRÁFICO
 
 Plotpop2020IBGE <-
-  ggplot(data = popIBGE2020, aes(x = fxetaria, y = ifelse(sexo == "M", porcentagem, -porcentagem), color = sexo)) +
-  geom_line(aes(group = sexo), position = position_dodge(width = 0.8), size = 1.5) +
-  scale_color_manual(values = c("#343496", "#f95d06"), labels = c("Mulheres", "Homens")) +
-  scale_y_continuous(
-    labels = function(x) paste(abs(x), "%"),
-    limits = c(-12, 15),
-    breaks = seq(-10, 10, 2)
+  ggplot(
+    data = popIBGE2020,
+    aes(x = fxetaria, group = sexo, color = sexo)
+  ) +
+  geom_line(
+    data = dplyr::filter(popIBGE2020, sexo == "M"),
+    aes(y = porcentagem),
+    position = position_dodge(width = 0.8),
+    size = 1.5,
+  ) +
+  geom_line(
+    data = dplyr::filter(popIBGE2020, sexo == "F"),
+    aes(y = -porcentagem),
+    position = position_dodge(width = 0.8),
+    size = 1.5,
   ) +
   coord_flip() +
+  scale_y_continuous(
+    labels = function(x) paste(abs(x), "%"),
+    limits = c(-10, 10),
+    breaks = seq(-10, 10, 2)
+  ) +
   theme_minimal() +
   # ROTULOS (1 == HOMEM &&& 2 == MULHER)
   scale_color_manual(
-    values = c("#f95d06", "#343496"), aesthetics = "fill",
+    values = c("#f95d06", "#343496"),
+    aesthetics = "color",
     labels = c("Homens", "Mulheres")
   ) +
   geom_hline(yintercept = 0, color = "#6f5d5d", size = .5, linetype = "solid") +
@@ -337,11 +439,19 @@ Plotpop2020IBGE <-
   ggplot2::coord_flip() +
   theme_minimal() +
   theme(
+    # panel.background = element_rect(color = "#f5f5f7", fill = "#f5f5f7"),
+    plot.title = element_text(size = 20, face = "bold"),
     panel.grid.major.x = element_line(linewidth = 0.7, color = "#e5dfdf"),
     panel.grid.major.y = element_line(linewidth = 0.5),
-    axis.text.x = element_text(size = 14),
-    axis.text.y = element_text(size = 12),
-    legend.position = "bottom"
+    axis.text.x = element_text(size = 14, face = "plain"),
+    axis.text.y = element_text(size = 14, face = "plain"),
+    axis.title.x = element_text(size = 16, face = "bold"),
+    axis.title.y = element_text(size = 16, face = "bold"),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 16),
+    legend.position = "bottom",
+    plot.caption = element_text(size = 12, hjust = 0),
+    plot.margin = margin(t = 10, r = 20, b = 20, l = 10)
   ) +
   labs(
     x = "Grupos Etários",
@@ -372,19 +482,33 @@ popIBGE2030 <-
 #  GRÁFICO
 
 Plotpop2030IBGE <-
-  ggplot(data = popIBGE2030, aes(x = fxetaria, y = ifelse(sexo == "M", porcentagem, -porcentagem), color = sexo)) +
-  geom_line(aes(group = sexo), position = position_dodge(width = 0.8), size = 1.5) +
-  scale_color_manual(values = c("#343496", "#f95d06"), labels = c("Mulheres", "Homens")) +
-  scale_y_continuous(
-    labels = function(x) paste(abs(x), "%"),
-    limits = c(-12, 15),
-    breaks = seq(-10, 10, 2)
+  ggplot(
+    data = popIBGE2030,
+    aes(x = fxetaria, group = sexo, color = sexo)
+  ) +
+  geom_line(
+    data = dplyr::filter(popIBGE2030, sexo == "M"),
+    aes(y = porcentagem),
+    position = position_dodge(width = 0.8),
+    size = 1.5,
+  ) +
+  geom_line(
+    data = dplyr::filter(popIBGE2030, sexo == "F"),
+    aes(y = -porcentagem),
+    position = position_dodge(width = 0.8),
+    size = 1.5,
   ) +
   coord_flip() +
+  scale_y_continuous(
+    labels = function(x) paste(abs(x), "%"),
+    limits = c(-10, 10),
+    breaks = seq(-10, 10, 2)
+  ) +
   theme_minimal() +
   # ROTULOS (1 == HOMEM &&& 2 == MULHER)
   scale_color_manual(
-    values = c("#f95d06", "#343496"), aesthetics = "fill",
+    values = c("#f95d06", "#343496"),
+    aesthetics = "color",
     labels = c("Homens", "Mulheres")
   ) +
   geom_hline(yintercept = 0, color = "#6f5d5d", size = .5, linetype = "solid") +
@@ -392,18 +516,26 @@ Plotpop2030IBGE <-
   ggplot2::coord_flip() +
   theme_minimal() +
   theme(
+    # panel.background = element_rect(color = "#f5f5f7", fill = "#f5f5f7"),
+    plot.title = element_text(size = 20, face = "bold"),
     panel.grid.major.x = element_line(linewidth = 0.7, color = "#e5dfdf"),
     panel.grid.major.y = element_line(linewidth = 0.5),
-    axis.text.x = element_text(size = 14),
-    axis.text.y = element_text(size = 12),
-    legend.position = "bottom"
+    axis.text.x = element_text(size = 14, face = "plain"),
+    axis.text.y = element_text(size = 14, face = "plain"),
+    axis.title.x = element_text(size = 16, face = "bold"),
+    axis.title.y = element_text(size = 16, face = "bold"),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 16),
+    legend.position = "bottom",
+    plot.caption = element_text(size = 12, hjust = 0),
+    plot.margin = margin(t = 10, r = 20, b = 20, l = 10)
   ) +
   labs(
     x = "Grupos Etários",
     y = "Distribuição da população (em milhares de pessoas)",
     fill = "Sexo",
     title = "Pirâmide Etária de 2030, Goiás",
-    caption = "Fonte: Projeção IBGE, 2020"
+    caption = "Fonte: Projeção IBGE, 2030"
   )
 
 Plotpop2030IBGE
@@ -428,3 +560,126 @@ Plotpop2010
 Plotpop2015IBGE
 Plotpop2020IBGE
 Plotpop2030IBGE
+
+library(tidyverse)
+
+pop1991 <- pop1991 |> dplyr::mutate(ano = 1991)
+pop2000 <- pop2000 |> dplyr::mutate(ano = 2000)
+pop2010 <- pop2010 |> dplyr::mutate(ano = 2010)
+
+popIBGE2015 <- popIBGE2015 |> dplyr::mutate(ano = 2015)
+popIBGE2020 <- popIBGE2020 |> dplyr::mutate(ano = 2020)
+popIBGE2030 <- popIBGE2030 |> dplyr::mutate(ano = 2030)
+
+
+merge(x = pop1991, y = pop2000, by = c("fxetaria", "sexo"))  |> 
+# dplyr::select(c("fxetaria","sexo","ano.x","ano.y", "porcentagem.x", "porcentagem.y")) |>
+dplyr::select(-c("populacao.x","populacao.y")) |>
+tidyr::pivot_longer(
+  cols = c("ano.x","ano.y"),
+               names_to = "anoRemove",
+               values_to = "ano"
+  )  |>
+  tidyr::pivot_longer(
+  cols = c("porcentagem.x","porcentagem.y"),
+               names_to = "porcentagemRemove",
+               values_to = "porcentagem"
+  ) |>
+  dplyr::select(-c("anoRemove", "porcentagemRemove")) |>
+  
+  # JUNTANDO OUTRO DATASET
+  # JUNTANDO OUTRO DATASET
+  # JUNTANDO OUTRO DATASET
+
+  merge(y = pop2010, by = c("fxetaria", "sexo"))  |> 
+# dplyr::select(c("fxetaria","sexo","ano.x","ano.y", "porcentagem.x", "porcentagem.y")) |>
+dplyr::select(-c("populacao.x","populacao.y")) |>
+tidyr::pivot_longer(
+  cols = c("ano.x","ano.y"),
+               names_to = "anoRemove",
+               values_to = "ano"
+  )  |>
+  tidyr::pivot_longer(
+  cols = c("porcentagem.x","porcentagem.y"),
+               names_to = "porcentagemRemove",
+               values_to = "porcentagem"
+  ) |>
+  dplyr::select(-c("anoRemove", "porcentagemRemove"))
+
+
+
+
+
+
+
+ggplot(
+  data = popIBGE2030,
+  aes(x = fxetaria, group = sexo, color = sexo)
+) +
+  geom_line(
+    data = dplyr::filter(popIBGE2030, sexo %in% c(1, "1", "M")),
+    aes(y = porcentagem),
+    position = position_dodge(width = 0.8),
+    size = 1.5,
+  ) +
+  geom_line(
+    data = dplyr::filter(popIBGE2030, sexo %in% c(2, "2", "F")),
+    aes(y = -porcentagem),
+    position = position_dodge(width = 0.8),
+    size = 1.5,
+  ) +
+  coord_flip() +
+  scale_y_continuous(
+    labels = function(x) paste(abs(x), "%"),
+    limits = c(-10, 10),
+    breaks = seq(-10, 10, 2)
+  ) +
+  theme_minimal() +
+  # ROTULOS (1 == HOMEM &&& 2 == MULHER)
+  scale_color_manual(
+    values = c("#f95d06", "#343496"),
+    aesthetics = "color",
+    labels = c("Homens", "Mulheres")
+  ) +
+  geom_hline(yintercept = 0, color = "#6f5d5d", size = .5, linetype = "solid") +
+  # girar gráfico
+  ggplot2::coord_flip()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+theme_minimal() +
+  theme(
+    # panel.background = element_rect(color = "#f5f5f7", fill = "#f5f5f7"),
+    plot.title = element_text(size = 20, face = "bold"),
+    panel.grid.major.x = element_line(linewidth = 0.7, color = "#e5dfdf"),
+    panel.grid.major.y = element_line(linewidth = 0.5),
+    axis.text.x = element_text(size = 14, face = "plain"),
+    axis.text.y = element_text(size = 14, face = "plain"),
+    axis.title.x = element_text(size = 16, face = "bold"),
+    axis.title.y = element_text(size = 16, face = "bold"),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 16),
+    legend.position = "bottom",
+    plot.caption = element_text(size = 12, hjust = 0),
+    plot.margin = margin(t = 10, r = 20, b = 20, l = 10)
+  ) +
+  labs(
+    x = "Grupos Etários",
+    y = "Distribuição da população (em milhares de pessoas)",
+    fill = "Sexo",
+    title = "Pirâmide Etária de 2030, Goiás",
+    caption = "Fonte: Projeção IBGE, 2030"
+  )
