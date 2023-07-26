@@ -26,8 +26,7 @@
 (
   pop1991 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-1|1-4|5-9")) |> 
-    dplyr::filter(! fxetaria %in% '10-14') |> 
+      stringr::str_detect(fxetaria, pattern = "\\b0-1\\b|\\b1-4\\b|\\b0-4\\b")) |>
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
   (
@@ -39,7 +38,7 @@
 (
   pop1991 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-1|1-4|5-9|10-14")) |> 
+      stringr::str_detect(fxetaria, pattern = "\\b0-1\\b|\\b1-4\\b|\\b0-4\\b|5-9|10-14")) |> 
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
   (
@@ -50,14 +49,14 @@
 (
   pop1991 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-1|1-4|5-9|10-14|60-64|65-69|70-74|75-79|80+")) |> 
+      stringr::str_detect(fxetaria, pattern = "\\b0-4\\b|\\b5-9\\b|\\b10-14\\b|60-64|65-69|70-74|75-79|80+")) |> 
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
   (
     pop1991 |> 
       dplyr::filter(
         # DIFERENTE DE 
-        ! stringr::str_detect(fxetaria, pattern = "0-1|1-4|5-9|10-14|60-64|65-69|70-74|75-79|80+")) |> 
+        ! stringr::str_detect(fxetaria, pattern = "\\b0-1\\b|\\b1-4\\b|\\b5-9\\b|\\b10-14\\b|60-64|65-69|70-74|75-79|80+")) |> 
       dplyr::ungroup() |> dplyr::select(populacao) |> sum()
   )
 
@@ -73,18 +72,9 @@
   (
     pop1991 |> 
       dplyr::filter(
-        ! stringr::str_detect(fxetaria, pattern = "0-1|1-4|5-9|10-14")) |> 
+        ! stringr::str_detect(fxetaria, pattern = "\\b0-4\\b|5\\b-9|\\b10-14\\b")) |> 
       dplyr::ungroup() |> dplyr::select(populacao) |> sum()
   )
-
-
-
-
-
-
-
-
-
 
 
 # q1b pop2000 ----
@@ -106,7 +96,7 @@
 (
   pop2000 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-1|1-4|5-9")) |> 
+      stringr::str_detect(fxetaria, pattern = "\\b0-4\\b|\\b0-1\\b|\\b1-4\\b")) |> 
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
   (
@@ -118,7 +108,7 @@
 (
   pop2000 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-1|1-4|5-9|10-14")) |> 
+      stringr::str_detect(fxetaria, pattern = "\\b0-4\\b|\\b0-1\\b|\\b1-4\\b|\\b5-9\\b|\\b10-14\\b")) |> 
     dplyr::filter(! fxetaria %in% '10-14') |> 
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
@@ -130,13 +120,13 @@
 (
   pop2000 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-1|1-4|5-9|10-14|60-64|65-69|70-74|75-79|80+")) |> 
+      stringr::str_detect(fxetaria, pattern = "\\b0-4\\b|\\b0-1\\b|\\b1-4\\b|\\b5-9\\b|\\b10-14\\b|60-64|65-69|70-74|75-79|80+")) |> 
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
   (
     pop2000 |> 
       dplyr::filter(
-        ! stringr::str_detect(fxetaria, pattern = "0-1|1-4|5-9|10-14|60-64|65-69|70-74|75-79|80+")) |> 
+        ! stringr::str_detect(fxetaria, pattern = "\\b0-4\\b|\\b0-1\\b|\\b1-4\\b|\\b5-9\\b|\\b10-14\\b|60-64|65-69|70-74|75-79|80+")) |> 
       dplyr::ungroup() |> dplyr::select(populacao) |> sum()
   )
 
@@ -152,18 +142,9 @@
   (
     pop2000 |> 
       dplyr::filter(
-        ! stringr::str_detect(fxetaria, pattern = "0-1|1-4|5-9|10-14")) |> 
+        ! stringr::str_detect(fxetaria, pattern = "\\b0-4\\b|\\b0-1\\b|\\b1-4\\b|\\b5-9\\b|\\b10-14\\b")) |> 
       dplyr::ungroup() |> dplyr::select(populacao) |> sum()
   )
-
-
-
-
-
-
-
-
-
 
 # q1b pop2010 ----
 
@@ -184,7 +165,7 @@
 (
   pop2010 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-1|1-4|5-9")) |> 
+      stringr::str_detect(fxetaria, pattern = "\\b0-1\\b|\\b1-4\\b|\\b0-4\\b")) |> 
     dplyr::filter(! fxetaria %in% '10-14') |> 
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
@@ -197,7 +178,7 @@
 (
   pop2010 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-1|1-4|5-9|10-14")) |> 
+      stringr::str_detect(fxetaria, pattern = "\\b0-4\\b|\\b5-9\\b|\\b10-14\\b")) |> 
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
   (
@@ -208,13 +189,13 @@
 (
   pop2010 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-1|1-4|5-9|10-14|60-64|65-69|70-74|75-79|80+")) |> 
+      stringr::str_detect(fxetaria, pattern = "\\b0-4\\b|\\b0-1\\b|\\b1-4\\b|\\b5-9\\b|\\b10-14\\b|60-64|65-69|70-74|75-79|80+")) |> 
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
   (
     pop2010 |> 
       dplyr::filter(
-        ! stringr::str_detect(fxetaria, pattern = "0-1|1-4|5-9|10-14|60-64|65-69|70-74|75-79|80+")) |> 
+        ! stringr::str_detect(fxetaria, pattern = "\\b0-4\\b|\\b0-1\\b|\\b1-4\\b|\\b5-9\\b|\\b10-14\\b|60-64|65-69|70-74|75-79|80+")) |> 
       dplyr::ungroup() |> dplyr::select(populacao) |> sum()
   )
 
@@ -230,88 +211,10 @@
   (
     pop2010 |> 
       dplyr::filter(
-        ! stringr::str_detect(fxetaria, pattern = "0-1|1-4|5-9|10-14")) |> 
+        ! stringr::str_detect(fxetaria, pattern = "\\b0-4\\b|\\b0-1\\b|\\b1-4\\b|\\b5-9\\b|\\b10-14\\b")) |> 
       dplyr::ungroup() |> dplyr::select(populacao) |> sum()
   )
 
-
-
-
-
-
-
-# q1b popIBGE2010 ----
-'popIBGE2010 |> dplyr::filter(stringr::str_detect(fxetaria, pattern = "Total"))'
-
-# - proporção de idosos (60 anos e mais)
-
-(
-  popIBGE2010 |> 
-    dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "60-64|65-69|70-74|75-79|80-84|85+")) |> 
-    dplyr::ungroup() |> dplyr::select(populacao) |> sum()
-)/
-  (
-    sum(popIBGE2010$populacao, na.rm = TRUE)
-    
-    # popIBGE2010 |> dplyr::ungroup() |> dplyr::select(populacao) |> sum()
-  )
-
-
-# - proporção de crianças (0 a 4 anos)
-(
-  popIBGE2010 |> 
-    dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-4|5-9")) |> 
-    dplyr::ungroup() |> dplyr::select(populacao) |> sum()
-)/
-  (
-    sum(popIBGE2010$populacao, na.rm = TRUE)
-    # popIBGE2010 |>    dplyr::ungroup() |> dplyr::select(populacao) |> sum()
-  )
-
-
-# - proporção de jovens (0 a 14 anos)
-(
-  popIBGE2010 |> 
-    dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-4|5-9|10-14")) |> 
-    dplyr::ungroup() |> dplyr::select(populacao) |> sum()
-)/
-  (
-    sum(popIBGE2010$populacao, na.rm = TRUE)
-    # popIBGE2010 |>    dplyr::ungroup() |> dplyr::select(populacao) |> sum()
-  )
-
-# - razão de dependência 
-(
-  popIBGE2010 |> 
-    dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-4|5-9|10-14|60-64|65-69|70-74|75-79|80+")) |> 
-    dplyr::ungroup() |> dplyr::select(populacao) |> sum()
-)/
-  (
-    popIBGE2010 |> 
-      dplyr::filter(
-        ! stringr::str_detect(fxetaria, pattern = "0-4|5-9|10-14|60-64|65-69|70-74|75-79|80+")) |> 
-      dplyr::ungroup() |> dplyr::select(populacao) |> sum()
-  )
-
-
-# - índice de envelhecimento)
-
-(
-  popIBGE2010 |> 
-    dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "60-64|65-69|70-74|75-79|80+")) |> 
-    dplyr::ungroup() |> dplyr::select(populacao) |> sum()
-)/
-  (
-    popIBGE2010 |> 
-      dplyr::filter(
-        ! stringr::str_detect(fxetaria, pattern = "0-4|5-9|10-14")) |> 
-      dplyr::ungroup() |> dplyr::select(populacao) |> sum()
-  )
 
 
 # q1b popIBGE2015 ----
@@ -335,7 +238,7 @@
 (
   popIBGE2015 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-4|5-9")) |> 
+      stringr::str_detect(fxetaria, pattern = "\\b0-1\\b|\\b1-4\\b|\\b0-4\\b|5-9")) |> 
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
   (
@@ -348,7 +251,7 @@
 (
   popIBGE2015 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-4|5-9|10-14")) |> 
+      stringr::str_detect(fxetaria, pattern = "\\b0-1\\b|\\b1-4\\b|\\b0-4\\b|5-9|10-14")) |> 
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
   (
@@ -360,13 +263,13 @@
 (
   popIBGE2015 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-4|5-9|10-14|60-64|65-69|70-74|75-79|80+")) |> 
+      stringr::str_detect(fxetaria, pattern = "\\b0-4\\b|\\b5-9\\b|\\b10-14\\b|60-64|65-69|70-74|75-79|80+")) |> 
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
   (
     popIBGE2015 |> 
       dplyr::filter(
-        ! stringr::str_detect(fxetaria, pattern = "0-4|5-9|10-14|60-64|65-69|70-74|75-79|80+")) |> 
+        ! stringr::str_detect(fxetaria, pattern = "\\b0-1\\b|\\b1-4\\b|\\b0-4\\b|5-9|10-14|60-64|65-69|70-74|75-79|80+")) |> 
       dplyr::ungroup() |> dplyr::select(populacao) |> sum()
   )
 
@@ -382,7 +285,7 @@
   (
     popIBGE2015 |> 
       dplyr::filter(
-        ! stringr::str_detect(fxetaria, pattern = "0-4|5-9|10-14")) |> 
+        ! stringr::str_detect(fxetaria, pattern = "\\b0-1\\b|\\b1-4\\b|\\b0-4\\b|\\b5-9\\b|\\b10-14\\b")) |> 
       dplyr::ungroup() |> dplyr::select(populacao) |> sum()
   )
 
@@ -398,7 +301,7 @@
 (
   popIBGE2020 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "60-64|65-69|70-74|75-79|80+")) |> 
+      stringr::str_detect(fxetaria, pattern = "\\b60-64\\b|\\b65-69\\b|\\b70-74\\b|\\b75-79\\b|80+")) |> 
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
   (
@@ -411,7 +314,7 @@
 (
   popIBGE2020 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-4|5-9")) |> 
+      stringr::str_detect(fxetaria, pattern = "\\b0-1\\b|\\b1-4\\b|\\b0-4\\b|\\b5-9\\b")) |> 
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
   (
@@ -424,7 +327,7 @@
 (
   popIBGE2020 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-4|5-9|10-14")) |> 
+      stringr::str_detect(fxetaria, pattern = "\\b0-1\\b|\\b1-4\\b|\\b0-4\\b|\\b5-9\\b|\\b10-14\\b")) |> 
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
   (
@@ -436,13 +339,13 @@
 (
   popIBGE2020 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-4|5-9|10-14|60-64|65-69|70-74|75-79|80+")) |> 
+      stringr::str_detect(fxetaria, pattern = "\\b0-1\\b|\\b1-4\\b|\\b0-4\\b|\\b5-9\\b|\\b10-14\\b|\\b60-64\\b|\\b65-69\\b|\\b70-74\\b|\\b75-79\\b|80+")) |> 
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
   (
     popIBGE2020 |> 
       dplyr::filter(
-        ! stringr::str_detect(fxetaria, pattern = "0-4|5-9|10-14|60-64|65-69|70-74|75-79|80+")) |> 
+        ! stringr::str_detect(fxetaria, pattern = "\\b0-1\\b|\\b1-4\\b|\\b0-4\\b|\\b5-9\\b|\\b10-14\\b|\\b60-64\\b|\\b65-69\\b|\\b70-74\\b|\\b75-79\\b|80+")) |> 
       dplyr::ungroup() |> dplyr::select(populacao) |> sum()
   )
 
@@ -458,7 +361,7 @@
   (
     popIBGE2020 |> 
       dplyr::filter(
-        ! stringr::str_detect(fxetaria, pattern = "0-4|5-9|10-14")) |> 
+        ! stringr::str_detect(fxetaria, pattern = "\\b0-1\\b|\\b1-4\\b|\\b0-4\\b|\\b5-9\\b|\\b10-14\\b")) |> 
       dplyr::ungroup() |> dplyr::select(populacao) |> sum()
   )
 
@@ -489,7 +392,7 @@
 (
   popIBGE2030 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-4|5-9")) |> 
+      stringr::str_detect(fxetaria, pattern = "\\b0-1\\b|\\b1-4\\b|\\b0-4\\b")) |> 
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
   (
@@ -502,7 +405,7 @@
 (
   popIBGE2030 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-4|5-9|10-14")) |> 
+      stringr::str_detect(fxetaria, pattern = "\\b0-1\\b|\\b1-4\\b|\\b0-4\\b|\\b5-9\\b|\\b10-14\\b")) |> 
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
   (    sum(popIBGE2030$populacao, na.rm = TRUE)
@@ -513,13 +416,13 @@
 (
   popIBGE2030 |> 
     dplyr::filter(
-      stringr::str_detect(fxetaria, pattern = "0-4|5-9|10-14|60-64|65-69|70-74|75-79|80+")) |> 
+      stringr::str_detect(fxetaria, pattern = "\\b0-1\\b|\\b1-4\\b|\\b0-4\\b|\\b5-9\\b|\\b10-14\\b|60-64|65-69|70-74|75-79|80+")) |> 
     dplyr::ungroup() |> dplyr::select(populacao) |> sum()
 )/
   (
     popIBGE2030 |> 
       dplyr::filter(
-        ! stringr::str_detect(fxetaria, pattern = "0-4|5-9|10-14|60-64|65-69|70-74|75-79|80+")) |> 
+        ! stringr::str_detect(fxetaria, pattern = "\\b0-1\\b|\\b1-4\\b|\\b0-4\\b|\\b5-9\\b|\\b10-14\\b|60-64|65-69|70-74|75-79|80+")) |> 
       dplyr::ungroup() |> dplyr::select(populacao) |> sum()
   )
 
@@ -535,7 +438,7 @@
   (
     popIBGE2030 |> 
       dplyr::filter(
-        ! stringr::str_detect(fxetaria, pattern = "0-4|5-9|10-14")) |> 
+        ! stringr::str_detect(fxetaria, pattern = "\\b0-1\\b|\\b1-4\\b|\\b0-4\\b|\\b5-9\\b|\\b10-14\\b")) |> 
       dplyr::ungroup() |> dplyr::select(populacao) |> sum()
   )
 
@@ -544,10 +447,7 @@
 
 # IDADE MEDIA E MEDIANA ---------------------------------------------------
 
-pop1991 |> 
-  dplyr::group_by(fxetaria) |> 
-  mean(populacao)
-
+pop1991
 pop2000
 pop2010
 popIBGE2015
