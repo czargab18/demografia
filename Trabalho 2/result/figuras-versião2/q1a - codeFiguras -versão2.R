@@ -117,3 +117,198 @@ ggsave(
 )
 
 
+# # c ------------------------------------------------------
+# # c ------------------------------------------------------
+# # c ------------------------------------------------------
+# # c ------------------------------------------------------
+# # c ------------------------------------------------------
+# # c ------------------------------------------------------
+# # c ------------------------------------------------------
+# # c ------------------------------------------------------
+# # c ------------------------------------------------------
+# # c ------------------------------------------------------
+# # c ------------------------------------------------------
+# # c ------------------------------------------------------
+# # c ------------------------------------------------------
+# # c ------------------------------------------------------
+# # c ------------------------------------------------------
+# # c ------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+pop1991 <- pop1991 |> dplyr::mutate(ano = 1991)
+pop2000 <- pop2000 |> dplyr::mutate(ano = 2000)
+pop2010 <- pop2010 |> dplyr::mutate(ano = 2010)
+
+popIBGE2015 <- popIBGE2015 |> dplyr::mutate(ano = 2015, sexo = dplyr::case_when(sexo %in% "F"~"2",sexo %in%"M"~"1", TRUE~sexo))
+popIBGE2020 <- popIBGE2020 |> dplyr::mutate(ano = 2020, sexo = dplyr::case_when(sexo %in% "F"~"2",sexo %in%"M"~"1", TRUE~sexo))
+popIBGE2030 <- popIBGE2030 |> dplyr::mutate(ano = 2030, sexo = dplyr::case_when(sexo %in% "F"~"2",sexo %in%"M"~"1", TRUE~sexo))
+
+
+datasetCompleto <- 
+merge(x = pop1991, y = pop2000, by = c("fxetaria", "sexo"))  |> 
+# dplyr::select(c("fxetaria","sexo","ano.x","ano.y", "porcentagem.x", "porcentagem.y")) |>
+dplyr::select(-c("populacao.x","populacao.y")) |>
+tidyr::pivot_longer(
+  cols = c("ano.x","ano.y"),
+               names_to = "anoRemove",
+               values_to = "ano"
+  )  |>
+  tidyr::pivot_longer(
+  cols = c("porcentagem.x","porcentagem.y"),
+               names_to = "porcentagemRemove",
+               values_to = "porcentagem"
+  ) |>
+  dplyr::select(-c("anoRemove", "porcentagemRemove"))  |>
+  
+  # JUNTANDO OUTRO DATASET
+  # JUNTANDO OUTRO DATASET
+  # JUNTANDO OUTRO DATASET
+
+  merge(y = pop2010, by = c("fxetaria", "sexo")) |>
+# dplyr::select(c("fxetaria","sexo","ano.x","ano.y", "porcentagem.x", "porcentagem.y")) |>
+dplyr::select(-"populacao")  |>
+tidyr::pivot_longer(
+  cols = c("ano.x","ano.y"),
+               names_to = "anoRemove",
+               values_to = "ano"
+  )  |>
+  tidyr::pivot_longer(
+  cols = c("porcentagem.x","porcentagem.y"),
+               names_to = "porcentagemRemove",
+               values_to = "porcentagem"
+  ) |>
+  dplyr::select(-c("anoRemove", "porcentagemRemove")) |>
+
+  # JUNTANDO OUTRO DATASET
+  # JUNTANDO OUTRO DATASET
+  # JUNTANDO OUTRO DATASET
+
+  merge(y = popIBGE2015, by = c("fxetaria", "sexo")) |>
+# dplyr::select(c("fxetaria","sexo","ano.x","ano.y", "porcentagem.x", "porcentagem.y")) |>
+dplyr::select(-"populacao") |>
+tidyr::pivot_longer(
+  cols = c("ano.x","ano.y"),
+               names_to = "anoRemove",
+               values_to = "ano"
+  )  |>
+  tidyr::pivot_longer(
+  cols = c("porcentagem.x","porcentagem.y"),
+               names_to = "porcentagemRemove",
+               values_to = "porcentagem"
+  ) |>
+  dplyr::select(-c("anoRemove", "porcentagemRemove")) |>
+
+  # JUNTANDO OUTRO DATASET
+  # JUNTANDO OUTRO DATASET
+  # JUNTANDO OUTRO DATASET
+
+  merge(y = popIBGE2020, by = c("fxetaria", "sexo")) |>
+# dplyr::select(c("fxetaria","sexo","ano.x","ano.y", "porcentagem.x", "porcentagem.y")) |>
+dplyr::select(-"populacao") |>
+tidyr::pivot_longer(
+  cols = c("ano.x","ano.y"),
+               names_to = "anoRemove",
+               values_to = "ano"
+  )  |>
+  tidyr::pivot_longer(
+  cols = c("porcentagem.x","porcentagem.y"),
+               names_to = "porcentagemRemove",
+               values_to = "porcentagem"
+  ) |>
+  dplyr::select(-c("anoRemove", "porcentagemRemove")) |>
+
+  # JUNTANDO OUTRO DATASET
+  # JUNTANDO OUTRO DATASET
+  # JUNTANDO OUTRO DATASET
+
+  merge(y = popIBGE2030, by = c("fxetaria", "sexo")) |>
+# dplyr::select(c("fxetaria","sexo","ano.x","ano.y", "porcentagem.x", "porcentagem.y")) |>
+dplyr::select(-"populacao") |>
+tidyr::pivot_longer(
+  cols = c("ano.x","ano.y"),
+               names_to = "anoRemove",
+               values_to = "ano"
+  )  |>
+  tidyr::pivot_longer(
+  cols = c("porcentagem.x","porcentagem.y"),
+               names_to = "porcentagemRemove",
+               values_to = "porcentagem"
+  ) |>
+  dplyr::select(-c("anoRemove", "porcentagemRemove")) |>
+  dplyr::distinct()
+
+
+
+datasetCompleto
+
+  ggplot(
+    data = datasetCompleto,
+    aes(x = fxetaria, color = sexo)
+  ) +
+  geom_line(
+    data = dplyr::filter(datasetCompleto, sexo == "1"),
+    aes(y = porcentagem),
+    position = position_dodge(width = 0.8),
+    size = 1.5,
+  ) +
+  geom_line(
+    data = dplyr::filter(datasetCompleto, sexo == "2"),
+    aes(y = -porcentagem),
+    position = position_dodge(width = 0.8),
+    size = 1.5,
+  ) +
+  coord_flip() +
+  facet_wrap(~ano)
+
+
+
+
+  scale_y_continuous(
+    labels = function(x) paste(abs(x), "%"),
+    limits = c(-12, 12),
+    breaks = seq(-10, 10, 2)
+  ) +
+  theme_minimal() +
+  # ROTULOS (1 == HOMEM &&& 2 == MULHER)
+  scale_color_manual(
+    values = c("#f95d06", "#343496"),
+    aesthetics = "color",
+    labels = c("Homens", "Mulheres")
+  ) +
+  geom_hline(yintercept = 0, color = "#6f5d5d", size = .5, linetype = "solid") +
+  # girar gráfico
+  ggplot2::coord_flip() +
+  theme_minimal() +
+
+
+  theme(
+    # panel.background = element_rect(color = "#f5f5f7", fill = "#f5f5f7"),
+    plot.title = element_text(size = 20, face = "bold"),
+    panel.grid.major.x = element_line(linewidth = 0.7, color = "#e5dfdf"),
+    panel.grid.major.y = element_line(linewidth = 0.5),
+    axis.text.x = element_text(size = 14, face = "plain"),
+    axis.text.y = element_text(size = 14, face = "plain"),
+    axis.title.x = element_text(size = 16, face = "bold"),
+    axis.title.y = element_text(size = 16, face = "bold"),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 16),
+    legend.position = "bottom",
+    plot.caption = element_text(size = 12, hjust = 0),
+    plot.margin = margin(t = 10, r = 20, b = 20, l = 10)
+  ) +
+  labs(
+    x = "Grupos Etários",
+    y = "Distribuição da população (em milhares de pessoas)",
+    fill = "Sexo",
+    title = "Pirâmide Etária de 2030, Goiás",
+    caption = "Fonte: Projeção IBGE, 2030"
+  )

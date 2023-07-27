@@ -715,7 +715,7 @@ RS.2000<-
   ) |> 
   unnest(RS)
 
-
+RS.2000
 
 
 # RS.2010
@@ -765,7 +765,7 @@ RS.2030<-
     names_from = sexo,
     values_from = populacao
   ) |> 
-  dplyr::rename(homem = 'M', mulher = 'F') |> 
+  dplyr::rename(homem = C("F",'1'), mulher = c("F",'2')) |> 
   dplyr::mutate(
     RS = purrr::map2( 
       .x = homem, .y = mulher,
@@ -860,6 +860,16 @@ rm(popIBGE2010)
 rm(popIBGE2015)
 rm(popIBGE2020)
 rm(popIBGE2030)
+
+
+
+
+
+
+
+
+
+
 
 
 
