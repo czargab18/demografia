@@ -8,4 +8,12 @@
 
 
 
+# o que fazer ?  Avsliar :
 
+# - data de nascimento (índices de Whipple, Myers e Bachi)
+
+# - idade presumida (índices de Whipple, Myers e Bachi)
+
+# - Construa a pirâmide por idade simples
+
+# - Comente os resultados.
