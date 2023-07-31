@@ -312,3 +312,67 @@ datasetCompleto
     title = "Pirâmide Etária de 2030, Goiás",
     caption = "Fonte: Projeção IBGE, 2030"
   )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  geom_line(
+    data = dplyr::filter(popcenso2010, declarada == "homem"),
+    aes(y = popDeclarada),
+    position = position_dodge(width = 0.8),
+    size = 1.5,
+  ) +
+  geom_line(
+    data = dplyr::filter(popcenso2010, declarada == "mulher"),
+    aes(y = -popDeclarada),
+    position = position_dodge(width = 0.8),
+    size = 1.5,
+  ) +

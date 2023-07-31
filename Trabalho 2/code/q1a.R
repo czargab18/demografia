@@ -99,7 +99,8 @@ Plotpop1991 <-
     legend.text = element_text(size = 16),
     legend.position = "bottom",
     plot.caption = element_text(size = 12, hjust = 0),
-    plot.margin = margin(t = 10, r = 20, b = 20, l = 10)
+    plot.margin = margin(t = 10, r = 20, b = 20, l = 10),
+    aspect.ratio = (max(as.numeric(idadeSimples)) / 100 * max(Poecendeclarada))
   ) +
   labs(
     x = "Grupos Etários",
@@ -109,6 +110,7 @@ Plotpop1991 <-
     caption = "Fonte: DATASUS, 1991"
   )
 
+Plotpop1991
 # .Export Plot
 ggsave(
   filename = "Plotpop1991.png",
@@ -327,10 +329,10 @@ popIBGE2015
 #  GRÁFICO
 
 Plotpop2015IBGE <-
-ggplot(
-  data = popIBGE2015,
-  aes(x = fxetaria, group = sexo, color = sexo)
-) +
+  ggplot(
+    data = popIBGE2015,
+    aes(x = fxetaria, group = sexo, color = sexo)
+  ) +
   geom_line(
     data = dplyr::filter(popIBGE2015, sexo == "M"),
     aes(y = porcentagem),
@@ -554,10 +556,10 @@ ggsave(
 
 # Comente os resultados à luz da discussão
 # sobre transição demográfica.
-Plotpop1991 
-Plotpop2000 
-Plotpop2010 
+Plotpop1991
+Plotpop2000
+Plotpop2010
 
-Plotpop2015IBGE 
-Plotpop2020IBGE 
+Plotpop2015IBGE
+Plotpop2020IBGE
 Plotpop2030IBGE

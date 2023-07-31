@@ -129,9 +129,7 @@ sinascdf<-
   dplyr::select(ano,grupo_etario, sexo,contador) |> 
   tidyr::pivot_wider(
     names_from = ano, values_from = contador, values_fn = list(contador = sum)
-  )
-
-|> 
+  ) |> 
   dplyr::mutate(
     nNx_media = purrr::pmap_dbl(.l = list(`2014`,`2015`, `2016`),
                                 .f = \(x,y,z){ round( ((x+y+z)/3), digits = 2 )} )
