@@ -140,30 +140,35 @@ simdf <-
     NumNascidos2016 = dplyr::if_else(SEXO %in% "F", 46745,
       dplyr::if_else(SEXO %in% "M", 48780, NA),
     ),
-    nDx_media = purrr::pmap_dbl(
+    # óbitos médios do triênio e população projetada pelo
+    #   IBGE para 2015
+    nMx_media = purrr::pmap_dbl(
       .l = list(`2014`, `2015`, `2016`),
       .f = \(x, y, z){
         round(
-          ((x + y + z) / 3),
+          (((x + y + z) / 3) / y),
           digits = 2
         )
       }
     ),
+    # nascimentos médios do triênio - população projetada pelo
+    #   IBGE para 2015
     nNx_media = purrr::pmap_dbl(
       .l = list(`NumNascidos2014`, `NumNascidos2015`, `NumNascidos2016`),
       .f = \(x, y, z){
         round(
-          ((x + y + z) / 3),
+          (((x + y + z) / 3) / y),
           digits = 2
         )
       }
     ),
-  ) |>
-  tidyr::pivot_longer(
-    cols = c(NumNascidos2014, NumNascidos2015, NumNascidos2016),
-    names_to = "ano",
-    values_to = "NumNascidos"
-  ) |>
+  )
+# DESNECESSÁRIO ???????????????????????????????????????????????
+tidyr::pivot_longer(
+  cols = c(NumNascidos2014, NumNascidos2015, NumNascidos2016),
+  names_to = "ano",
+  values_to = "NumNascidos"
+) |>
   dplyr::mutate(
     ano = stringr::str_remove_all(
       string = ano,
@@ -175,20 +180,7 @@ View(simdf)
 
 View(sinascdf)
 
-#  dplyr::select(
-#    c(SEXO, grupo_etario, nNx_media, nNx_media)
-#  )
-#    ),
-#    nNx_media = purrr::pmap_dbl(
-#      .l = list(`NumNascidos2014`, `NumNascidos2015`, `NumNascidos2016`),
-#      .f = \(x, y, z){
-#        round(
-#          ((x + y + z) / 3),
-#          digits = 2
-#          )
-#      }
-#    ),
-#
+
 
 # ================= TÁBUA MASCULINA =================
 
