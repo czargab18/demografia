@@ -32,10 +32,10 @@ popcenso2010 <-
     dplyr::select(col = c(1, 3, 4, 13, 14)) |>
     dplyr::rename(
         "idadeSimples" = "col1",
-        "homemDeclarada" = "col2",
-        "mulherDeclarada" = "col3",
-        "homemDataNascim" = "col4",
-        "mulherDataNascim" = "col5",
+        "homemDataNascim" = "col2",
+        "mulherDataNascim" = "col3",
+        "homemDeclarada" = "col4",
+        "mulherDeclarada" = "col5",
     ) |>
     dplyr::mutate(
         idadeSimples = dplyr::case_when(
@@ -48,55 +48,71 @@ popcenso2010 <-
         mulherDeclarada = as.numeric(mulherDeclarada),
         homemDataNascim = as.numeric(homemDataNascim),
         mulherDataNascim = as.numeric(mulherDataNascim),
-    ) |>
-    tidyr::pivot_longer(
-        cols = c(homemDeclarada, mulherDeclarada),
-        names_to = "declarada",
-        values_to = "popDeclarada"
-    ) |>
-    tidyr::pivot_longer(
-        cols = c(homemDataNascim, mulherDataNascim),
-        names_to = "DataNascimento",
-        values_to = "popDataNascim"
-    ) |>
-    dplyr::mutate(
-        declarada = dplyr::case_when(
-            declarada %in% "homemDeclarada" ~ "homem",
-            declarada %in% "mulherDeclarada" ~ "mulher",
-            TRUE ~ declarada
-        ),
-        DataNascimento = dplyr::case_when(
-            DataNascimento %in% "homemDataNascim" ~ "homem",
-            DataNascimento %in% "mulherDataNascim" ~ "mulher",
-            TRUE ~ DataNascimento
-        )
-    ) |>
-    dplyr::filter(!idadeSimples %in% "Total") |>
-    dplyr::mutate(
-        idadeSimples = factor(forcats::as_factor(idadeSimples), levels = as.factor(seq(0, 100))),
     )
 
-popcenso2010Declar <-
+
+# popDeclar ---------------------------------------------------------
+
+popDeclar <-
     popcenso2010 |>
-    dplyr::select(-c(DataNascimento, popDataNascim)) |>
+    dplyr::select(-c(homemDataNascim, mulherDataNascim)) |>
+    tidyr::pivot_longer(
+        cols = c(homemDeclarada, mulherDeclarada),
+        names_to = "sexoDeclar",
+        values_to = "popDeclar"
+    ) |>
     dplyr::mutate(
-        Porcendeclarada = popDeclarada / sum(popDeclarada),
-    )
+        sexoDeclar = dplyr::case_when(
+            sexoDeclar %in% "homemDeclarada" ~ "homem",
+            sexoDeclar %in% "mulherDeclarada" ~ "mulher",
+            TRUE ~ sexoDeclar
+        ),
+        Porcendeclarada = popDeclar / sum(popDeclar),
+        idadeSimples = factor(forcats::as_factor(idadeSimples), levels = as.factor(seq(0, 100))),
+    ) |>
+    dplyr::filter(!idadeSimples %in% c("Total", NA, "NA"))
+
+popDeclar
+
+# popDtNascim ---------------------------------------------------
+
+popDtNascim <-
+    popcenso2010 |>
+    dplyr::select(c(idadeSimples, homemDataNascim, mulherDataNascim)) |>
+    tidyr::pivot_longer(
+        cols = c(homemDataNascim, mulherDataNascim),
+        names_to = "sexoDTNasc",
+        values_to = "popDTNasc"
+    ) |>
+    dplyr::mutate(
+        sexoDTNasc = dplyr::case_when(
+            sexoDTNasc %in% "homemDataNascim" ~ "homem",
+            sexoDTNasc %in% "mulherDataNascim" ~ "mulher",
+            TRUE ~ sexoDTNasc
+        ),
+        PorcenderDtNasc = popDTNasc / sum(popDTNasc),
+        idadeSimples = factor(forcats::as_factor(idadeSimples), levels = as.factor(seq(0, 100))),
+    ) |>
+    dplyr::filter(!idadeSimples %in% c("Total", NA, "NA"))
+
+
+# GRÁFICO ===========================================================
+popDeclar
+popDtNascim
 
 library(ggplot2)
 
-Plotpopcenso2010 <-
-    # gráfico
+PlotpopDeclar <-
     ggplot(
-        data = popcenso2010Declar,
-        aes(x = idadeSimples, group = declarada, fill = declarada)
+        data = popDeclar,
+        aes(x = idadeSimples, group = sexoDeclar, fill = sexoDeclar)
     ) +
     ggplot2::geom_bar(
-        data = filter(popcenso2010Declar, declarada == "mulher"),
+        data = filter(popDeclar, sexoDeclar == "mulher"),
         aes(y = Porcendeclarada), stat = "identity", position = position_dodge(1)
     ) +
     ggplot2::geom_bar(
-        data = filter(popcenso2010Declar, declarada == "homem"),
+        data = filter(popDeclar, sexoDeclar == "homem"),
         aes(y = -Porcendeclarada), stat = "identity", position = position_dodge(1)
     ) +
     ggplot2::coord_flip() +
@@ -104,7 +120,7 @@ Plotpopcenso2010 <-
         breaks = seq(0, 100, 5)
     ) +
     scale_y_continuous(
-        labels = function(x) paste(abs(x)*100, "%")
+        labels = function(x) paste(abs(x) * 100, "%")
     ) +
     theme_minimal() +
     # ROTULOS (1 == HOMEM &&& 2 == MULHER)
@@ -137,12 +153,12 @@ Plotpopcenso2010 <-
     )
 
 
-Plotpopcenso2010
+PlotpopDeclar
 
 # .Export Plot
 ggsave(
-    filename = "Plotpopcenso2010.png",
-    plot = Plotpopcenso2010,
+    filename = "PlotpopDeclar.png",
+    plot = PlotpopDeclar,
     path = "Trabalho 2/result/figuras/",
     scale = 1,
     dpi = 300,
@@ -152,39 +168,30 @@ ggsave(
 )
 
 
-view(popcenso2010)
-
-popcenso2010datanascime <- 
-popcenso2010 |>
-    dplyr::select(c(
-        idadeSimples,
-        DataNascimento, popDataNascim
-    )) |>
-    dplyr::mutate(
-        PorcenDataNascimento = popDataNascim / sum(popDataNascim),
-    )
+# Gráfico ==============================
 
 # - Comente os resultados.
-Plotpopcenso2010datanascime <- 
+
+PlotpopDtNascim <-
     # gráfico
     ggplot(
-        data = popcenso2010datanascime,
-        aes(x = idadeSimples, group = popDataNascim, fill = popDataNascim)
+        data = popDtNascim,
+        aes(x = idadeSimples, group = sexoDTNasc, fill = sexoDTNasc)
     ) +
     ggplot2::geom_bar(
-        data = filter(popcenso2010datanascime, popDataNascim == "mulher"),
-        aes(y = PorcenDataNascimento), stat = "identity", position = position_dodge(1)
+        data = filter(popDtNascim, sexoDTNasc == "mulher"),
+        aes(y = PorcenderDtNasc), stat = "identity", position = position_dodge(1)
     ) +
     ggplot2::geom_bar(
-        data = filter(popcenso2010datanascime, popDataNascim == "homem"),
-        aes(y = -PorcenDataNascimento), stat = "identity", position = position_dodge(1)
+        data = filter(popDtNascim, sexoDTNasc == "homem"),
+        aes(y = -PorcenderDtNasc), stat = "identity", position = position_dodge(1)
     ) +
     ggplot2::coord_flip() +
     scale_x_discrete(
         breaks = seq(0, 100, 5)
     ) +
     scale_y_continuous(
-        labels = function(x) paste(abs(x)*100, "%")
+        labels = function(x) paste(abs(x) * 100, "%")
     ) +
     theme_minimal() +
     # ROTULOS (1 == HOMEM &&& 2 == MULHER)
@@ -216,12 +223,11 @@ Plotpopcenso2010datanascime <-
         caption = "Fonte: DATASUS, 2010"
     )
 
-Plotpopcenso2010datanascime
-
+PlotpopDtNascim
 # .Export Plot
 ggsave(
-    filename = "Plotpopcenso2010.png",
-    plot = Plotpopcenso2010,
+    filename = "PlotpopDtNascim.png",
+    plot = PlotpopDtNascim,
     path = "Trabalho 2/result/figuras/",
     scale = 1,
     dpi = 300,
