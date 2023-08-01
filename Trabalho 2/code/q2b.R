@@ -14,7 +14,7 @@ ordemetaria<-
   c("15-19", "20-24", "25-29", "30-34",
     "35-39","40-44","45-49")
 
-sinascdf<-
+# sinascdf<-
   microdatasus::fetch_datasus( year_start = 2014, year_end = 2016, uf = 'GO', 
                                information_system = 'SINASC', vars = c('DTNASC','IDADEMAE','SEXO') ) |> 
   dplyr::rename(sexo = SEXO) |> 
