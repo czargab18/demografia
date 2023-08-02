@@ -4,7 +4,9 @@
 #   2014-2016 (nascimentos e óbitos médios do triênio e população projetada pelo
 #   IBGE para 2015). Construa uma tábua de vida e obtenha as taxas específicas
 #   de fecundidade.
-
+"
+link: https://www.ibge.gov.br/estatisticas/sociais/populacao/9662-censo-demografico-2010.html?=&t=downloads
+"
 # ============== TAXAS MASCULINA ==============
 "Numero de Nascimentos po IDADE"
 
@@ -34,6 +36,10 @@ sinascdf <-
     !SEXO %in% "I"
   )
 
+View(sinascdf)
+
+# ===============================================================
+
 "Numero de Óbitos por IDADE"
 
 ordemetaria <-
@@ -56,6 +62,7 @@ simdf <-
   ) |>
   dplyr::mutate(
     ano = format(lubridate::dmy(DTOBITO), "%Y"),
+    contador = 1,
     grupo_etario = dplyr::case_when(
       stringr::str_detect(IDADE,
         pattern = stringr::str_c(sprintf("%03d", seq(000, 400)), collapse = "|")
@@ -106,84 +113,83 @@ simdf <-
     #     [1] "NA"  NA   "0-1"   "1-4"   "5-9"   "10-14" "15-19" "20-24" "25-29"
     #     [10] "30-34" "35-39" "40-44" "45-49" "50-54" "55-59" "60-64" "65-69" "70-74"
     #     [19] "75-79" "80+"
-    contador = 1,
   ) |>
   dplyr::arrange(grupo_etario) |>
-  dplyr::filter(!(
-    grupo_etario %in% c(99, "NA", NA) |
-      IDADE %in% c(999, "999", NA, 0, "0") |
-      SEXO %in% c("0", 0, "I", "i")
-  )) |>
-  dplyr::select(-c("IDADE", "DTOBITO")) |>
-  tidyr::pivot_wider(
-    names_from = ano,
-    values_from = contador,
-    values_fn = list(contador = sum)
-  ) |>
-  dplyr::mutate(
-    # JUNTANDO NÚMERO DE ÓBITOS COM NASCIDOS VIVOS - Manualmente
-    # SEXO %in% "F" & ano %in% 2014 ~ 48682,
-    # SEXO %in% "M" & ano %in% 2014 ~ 50959,
-
-
-    # SEXO %in% "F" & ano %in% 2015 ~ 49103,
-    # SEXO %in% "M" & ano %in% 2015 ~ 51515,
-
-    # SEXO %in% "F" & ano %in% 2016 ~ 46745,
-    # SEXO %in% "M" & ano %in% 2016 ~ 48780,
-    NumNascidos2014 = dplyr::if_else(SEXO %in% "F", 48682,
-      dplyr::if_else(SEXO %in% "M", 50959, NA),
-    ),
-    NumNascidos2015 = dplyr::if_else(SEXO %in% "F", 49103,
-      dplyr::if_else(SEXO %in% "M", 51515, NA),
-    ),
-    NumNascidos2016 = dplyr::if_else(SEXO %in% "F", 46745,
-      dplyr::if_else(SEXO %in% "M", 48780, NA),
-    ),
-    # óbitos médios do triênio e população projetada pelo
-    #   IBGE para 2015
-    nMx_media = purrr::pmap_dbl(
-      .l = list(`2014`, `2015`, `2016`),
-      .f = \(x, y, z){
-        round(
-          (((x + y + z) / 3) / y),
-          digits = 2
-        )
-      }
-    ),
-    # nascimentos médios do triênio - população projetada pelo
-    #   IBGE para 2015
-    nNx_media = purrr::pmap_dbl(
-      .l = list(`NumNascidos2014`, `NumNascidos2015`, `NumNascidos2016`),
-      .f = \(x, y, z){
-        round(
-          (((x + y + z) / 3) / y),
-          digits = 2
-        )
-      }
-    ),
-  )
-# DESNECESSÁRIO ???????????????????????????????????????????????
-tidyr::pivot_longer(
-  cols = c(NumNascidos2014, NumNascidos2015, NumNascidos2016),
-  names_to = "ano",
-  values_to = "NumNascidos"
-) |>
-  dplyr::mutate(
-    ano = stringr::str_remove_all(
-      string = ano,
-      pattern = "NumNascidos"
+  dplyr::filter(
+    !(
+      grupo_etario %in% c(99, "NA", NA) |
+        IDADE %in% c(999, "999", NA, 0, "0") |
+        SEXO %in% c("0", 0, "I", "i")
     )
-  )
+  ) |>
+  dplyr::select(-c("IDADE", "DTOBITO")) |>
+  # PIVOTEANDO APENAS A COLUNA: |=========> ANO <=========|
+  tidyr::pivot_wider(
+    names_from = ano, # os Nomes das NOVAS COLUNAS vem de 'ano'
+    values_from = contador, # os valores paras as NOVAS COLUNAS vem de 'contador'
+    # como ignora-se valores únicos como: "IDADE", "DTOBITO")
+    values_fn = list(contador = sum)
+    # Podemos somar os valores repetidos atraves de 'contador'
+  ) |>
+  # JUNTANDO NÚMERO DE ÓBITOS COM NASCIDOS VIVOS - Manualmente
+dplyr::mutate(
+  # SEXO %in% "F" & ano %in% 2014 ~ 48682,
+  # SEXO %in% "M" & ano %in% 2014 ~ 50959,
+  NumNascidos2014 = dplyr::if_else(SEXO %in% "F", 48682,
+    dplyr::if_else(SEXO %in% "M", 50959, NA),
+  ),
+
+  # SEXO %in% "F" & ano %in% 2015 ~ 49103,
+  # SEXO %in% "M" & ano %in% 2015 ~ 51515,
+  NumNascidos2015 = dplyr::if_else(SEXO %in% "F", 49103,
+    dplyr::if_else(SEXO %in% "M", 51515, NA),
+  ),
+
+  # SEXO %in% "F" & ano %in% 2016 ~ 46745,
+  # SEXO %in% "M" & ano %in% 2016 ~ 48780,
+  NumNascidos2016 = dplyr::if_else(SEXO %in% "F", 46745,
+    dplyr::if_else(SEXO %in% "M", 48780, NA),
+  ),
+  # óbitos médios do triênio e população projetada pelo
+  #   IBGE para 2015
+  nDx_media = purrr::pmap_dbl(
+    .l = list(`2014`, `2015`, `2016`),
+    .f = \(x, y, z){
+      round(
+        ((x + y + z) / 3),
+        digits = 2
+      )
+    }
+  ),
+  # nascimentos médios do triênio - população projetada pelo
+  #   IBGE para 2015
+  nNx_media = purrr::pmap_dbl(
+    .l = list(`NumNascidos2014`, `NumNascidos2015`, `NumNascidos2016`),
+    .f = \(x, y, z){
+      round(
+        ((x + y + z) / 3),
+        digits = 2
+      )
+    }
+  ), 
+    grupo_etario = as.character(grupo_etario)
+) |>
+  dplyr::select(c("SEXO", "grupo_etario", "nDx_media", "nNx_media")) |>
+  dplyr::arrange("grupo_etario")
 
 View(simdf)
 
-View(sinascdf)
-
-
-
 # ================= TÁBUA MASCULINA =================
 
+readODS::write_ods(
+  x = simdf,
+  path = "Trabalho 2/result/tabelas/simdf-TabVida.ods",
+  row_names = FALSE
+)
+
+
+write.csv(
+)
 # TÁBUA DE MORTALIDADE
 # ( MORTAL + FECUND ) CONSTANTES - TABUA DE 2010
 
