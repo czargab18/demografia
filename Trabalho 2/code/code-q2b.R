@@ -1,3 +1,34 @@
+ # SEXO %in% "F" & ano %in% 2014 ~ 48682,
+  # SEXO %in% "M" & ano %in% 2014 ~ 50959,
+  NumNascidos2014 = dplyr::if_else(SEXO %in% "F", 48682,
+    dplyr::if_else(SEXO %in% "M", 50959, NA),
+  ),
+
+  # SEXO %in% "F" & ano %in% 2015 ~ 49103,
+  # SEXO %in% "M" & ano %in% 2015 ~ 51515,
+  NumNascidos2015 = dplyr::if_else(SEXO %in% "F", 49103,
+    dplyr::if_else(SEXO %in% "M", 51515, NA),
+  ),
+
+  # SEXO %in% "F" & ano %in% 2016 ~ 46745,
+  # SEXO %in% "M" & ano %in% 2016 ~ 48780,
+  NumNascidos2016 = dplyr::if_else(SEXO %in% "F", 46745,
+    dplyr::if_else(SEXO %in% "M", 48780, NA),
+  ),
+
+
+  # nascimentos médios do triênio - população projetada pelo
+  #   IBGE para 2015
+  nNx_media = purrr::pmap_dbl(
+    .l = list("NumNascidos2014", "NumNascidos2015", "NumNascidos2016"),
+    .f = \(x, y, z){
+      round(
+        ((x + y + z) / 3),
+        digits = 2
+      )
+    }
+  ), 
+
   dplyr::mutate(
     NumNascidos =
       dplyr::case_when(

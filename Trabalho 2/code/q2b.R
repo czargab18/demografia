@@ -121,7 +121,7 @@ simdf <-
         IDADE %in% c(999, "999", NA, 0, "0") |
         SEXO %in% c("0", 0, "I", "i")
     )
-  ) |>
+  )  |>
   dplyr::select(-c("IDADE", "DTOBITO")) |>
   # PIVOTEANDO APENAS A COLUNA: |=========> ANO <=========|
   tidyr::pivot_wider(
@@ -133,24 +133,7 @@ simdf <-
   ) |>
   # JUNTANDO NÚMERO DE ÓBITOS COM NASCIDOS VIVOS - Manualmente
 dplyr::mutate(
-  # SEXO %in% "F" & ano %in% 2014 ~ 48682,
-  # SEXO %in% "M" & ano %in% 2014 ~ 50959,
-  NumNascidos2014 = dplyr::if_else(SEXO %in% "F", 48682,
-    dplyr::if_else(SEXO %in% "M", 50959, NA),
-  ),
-
-  # SEXO %in% "F" & ano %in% 2015 ~ 49103,
-  # SEXO %in% "M" & ano %in% 2015 ~ 51515,
-  NumNascidos2015 = dplyr::if_else(SEXO %in% "F", 49103,
-    dplyr::if_else(SEXO %in% "M", 51515, NA),
-  ),
-
-  # SEXO %in% "F" & ano %in% 2016 ~ 46745,
-  # SEXO %in% "M" & ano %in% 2016 ~ 48780,
-  NumNascidos2016 = dplyr::if_else(SEXO %in% "F", 46745,
-    dplyr::if_else(SEXO %in% "M", 48780, NA),
-  ),
-  # óbitos médios do triênio e população projetada pelo
+   # óbitos médios do triênio e população projetada pelo
   #   IBGE para 2015
   nDx_media = purrr::pmap_dbl(
     .l = list(`2014`, `2015`, `2016`),
@@ -161,35 +144,46 @@ dplyr::mutate(
       )
     }
   ),
-  # nascimentos médios do triênio - população projetada pelo
-  #   IBGE para 2015
-  nNx_media = purrr::pmap_dbl(
-    .l = list(`NumNascidos2014`, `NumNascidos2015`, `NumNascidos2016`),
-    .f = \(x, y, z){
-      round(
-        ((x + y + z) / 3),
-        digits = 2
-      )
-    }
-  ), 
     grupo_etario = as.character(grupo_etario)
 ) |>
-  dplyr::select(c("SEXO", "grupo_etario", "nDx_media", "nNx_media")) |>
-  dplyr::arrange("grupo_etario")
+  dplyr::select(c("SEXO", "grupo_etario", "nDx_media")) |>
+  dplyr::arrange("grupo_etario","SEXO")
 
-View(simdf)
 
-# ================= TÁBUA MASCULINA =================
+
+# POPTBR10.csv  2010 ----
+'data foi pego de ~/code/ImportData.R'
+pop2010 <- 
+pop2010 |>
+dplyr::rename('SEXO'= 'sexo', 'grupo_etario' = 'fxetaria') |>
+dplyr::mutate(
+  SEXO = dplyr::if_else(SEXO %in% '1', 'M','F')
+)
+
+
+simdfPop2010 <- 
+merge(x = simdf,y = pop2010, by = c("SEXO", 'grupo_etario')) |>
+dplyr::mutate(
+    grupo_etario = factor(grupo_etario, levels = ordemetaria),
+) |>
+dplyr::arrange(SEXO,grupo_etario)
+
+View(simdfPop2010)
+
+# ================= TÁBUA MASCULINA - FEMININA =================
 
 readODS::write_ods(
   x = simdf,
   path = "Trabalho 2/result/tabelas/simdf-TabVida.ods",
   row_names = FALSE
 )
-
-
-write.csv(
+readODS::write_ods(
+  x = simdfPop2010,
+  path = "Trabalho 2/result/tabelas/simdfPop2010-TabVida.ods",
+  row_names = FALSE
 )
+
+
 # TÁBUA DE MORTALIDADE
 # ( MORTAL + FECUND ) CONSTANTES - TABUA DE 2010
 
