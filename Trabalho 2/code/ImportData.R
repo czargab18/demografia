@@ -129,8 +129,7 @@ pop2010 <-
   dplyr::arrange(fxetaria)
 
 
-pop2010
-
+View(pop2010)
 # projeçoesIBGE -----------------------------------------------------------
 rm(ordemetaria) # ordem etária é diferente nos 2 primeiros grupos
 
@@ -154,7 +153,7 @@ projecoesIBGE <-
     x2030 = stringr::str_replace_all(x2030, pattern = ",", replace = "")
   )
 
-projecoesIBGE
+view(projecoesIBGE)
 
 # 2015.projecao ----
 
@@ -177,7 +176,9 @@ popIBGE2015 <-
   dplyr::summarise(populacao = sum(as.numeric(populacao))) |>
   dplyr::arrange(sexo)
 
-popIBGE2015
+
+view(popIBGE2015)
+
 # 2020.projecao ----
 
 popIBGE2020 <-
@@ -198,7 +199,7 @@ popIBGE2020 <-
   dplyr::summarise(populacao = sum(as.numeric(populacao))) |>
   dplyr::arrange(sexo)
 
-popIBGE2020
+view(popIBGE2020)
 # 2030.projecao ----
 
 popIBGE2030 <-

@@ -7,21 +7,19 @@
 "
 link: https://www.ibge.gov.br/estatisticas/sociais/populacao/9662-censo-demografico-2010.html?=&t=downloads
 "
-# ============== TAXAS MASCULINA ==============
-"Numero de Nascimentos po IDADE da mãe"
+# ============== TAXAS FECUNDIDADE CONSTANTE ==============
 
-sinasc.PROJ <-
-  purrr::map(
-    .x = c(2015, 2020),
-    .f = microdatasus::fetch_datasus(
-      uf = "GO",
-      year_start = .x,
-      year_end = 2016,
-      information_system = "SINASC",
-      vars = c("DTNASC", "SEXO", "IDADEMAE") # IDADEMÃE para Construir GRUPOS-ETÁRIOS
-    )
+'Numero de Nascimentos por IDADEMAE, contados pela coluna "contador"
+SEM/NÃO CONSIDERAR O SEXO dos nascidos-vivos'
+
+sinasc.Fecund <-
+  microdatasus::fetch_datasus(
+    uf = "GO",
+    year_start = 2014,
+    year_end = 2016,
+    information_system = "SINASC",
+    vars = c("DTNASC", "IDADEMAE","SEXO") # IDADEMÃE para Construir GRUPOS-ETÁRIOS
   ) |>
-  # dplyr::select(-"DTNASC") |>
   dplyr::mutate(
     IDADEMAE = as.numeric(as.character(IDADEMAE)),
     DTNASC = format(lubridate::dmy(DTNASC), "%Y"),
@@ -35,18 +33,16 @@ sinasc.PROJ <-
     SEXO = dplyr::case_when(
       SEXO %in% "1" ~ "M",
       SEXO %in% "2" ~ "F",
-      SEXO %in% "0" ~ "I",
+      SEXO %in% c(0,'0',9,"9") ~ "I",
       TRUE ~ SEXO
-    ),
+    ),,
     GRUPO = factor(
       GRUPO,
       levels = c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49")
     ),
   ) |>
   dplyr::filter(
-    !(
-      GRUPO %in% c(NA, "NA") | SEXO %in% c("I", 0, "0", NA)
-    )
+    !(GRUPO %in% c(NA, "NA"))
   ) |>
   # "IDADEMA usado para criar os GRUPOS-ETÁRIOS"
   dplyr::select(-"IDADEMAE") |>
@@ -57,31 +53,104 @@ sinasc.PROJ <-
     values_fn = list(contador = sum)
     # Podemos somar os valores repetidos atraves de 'contador'
   ) |>
-  dplyr::arrange(SEXO, GRUPO)
-
-
-View(sinasc.PROJ)
-
-sinascdf |>
+  dplyr::arrange(SEXO,GRUPO)
+  
+  sinasc.Fecund
+  
   dplyr::mutate(
-    ano = format(lubridate::dmy(DTNASC), "%Y"),
-    contador = 1,
+    # nascimentos médios do triênio - população projetada pelo IBGE para 2015
+    nNx_media = purrr::pmap_dbl(
+      .l = list(`2014`, `2015`, `2016`),
+      # .f = function(x, y, z) {
+      .f = \(x, y, z){
+        round(
+           ( (x + y + z) / 3 ),
+          digits = 2
+        )
+      }
+    )
+  )  |>
+  dplyr::select(c("GRUPO","nNx_media"))
+
+View(sinasc.Fecund)
+
+
+'POPULAÇÃO FEMININA 2010'
+
+popFem2015 <-
+  popIBGE2015 |>
+  dplyr::rename(
+    "SEXO" = "sexo",
+    "GRUPO" = "fxetaria",
+    "pop2015" = "populacao",
+  ) |>
+  dplyr::filter(
+    (
+      GRUPO %in% c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49") &
+        SEXO %in% c(2, "2", "F")
+    )
+  ) |>
+  dplyr::select(c("GRUPO", "pop2015"))
+
+View(popFem2015)
+
+
+"JUNTANDO NASCIMENTOS COM NÚMERO DA POPULAÇÃO 'FEMININA' 2010"
+
+tefFemini2015 <-
+  merge(
+    x = sinasc.Fecund, y = popFem2015,
+    by = "GRUPO"
+  ) |>
+  dplyr::select(-"SEXO") |>
+  dplyr::mutate(
+    tef2010 = purrr::map2(
+      .x = nNx_media,
+      .y = pop2015,
+      .f = ~ round((.x / .y), digits = 4)
+    )
+  ) |> dplyr::select(GRUPO, tef2010)
+
+
+'JUNTANDO BASES PARA CALCULAR TEF CONSTANTE - 2010'
+pop2010 |>
+  dplyr::rename(
+    "SEXO" = "sexo",
+    "GRUPO" = "fxetaria",
+    "Npop2010" = "populacao",
+  ) |>
+  dplyr::filter(
+    GRUPO %in% c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49")
+  ) |>
+  dplyr::mutate(
     SEXO = dplyr::case_when(
       SEXO %in% "1" ~ "M",
       SEXO %in% "2" ~ "F",
-      SEXO %in% "0" ~ "I",
+      SEXO %in% "9" ~ "I",
       TRUE ~ SEXO
-    )
-  ) |>
-  dplyr::group_by(SEXO, ano) |>
-  dplyr::summarise(
-    NumNascidos = sum(as.numeric(contador))
-  ) |>
-  dplyr::filter(
-    !SEXO %in% "I"
-  )
+    ),
+  )  |>
+dplyr::select(-'SEXO') |>
+  dplyr::select(-'SEXO')  |>
+  dplyr::group_by(GRUPO) |>
+  dplyr::summarise( 'Npop2010' = sum)
 
-View(sinascdf)
+merge(x = pop2010, y = tefFemini2015, by = 'GRUPO')
+
+
+View(tefFemini2015)
+
+
+
+"EXPORTANDO PARA EXCEL"
+
+# ============== FINAL :TAXAS FECUNDIDADE CONSTANTE ==============
+
+
+
+
+
+
 
 # ===============================================================
 

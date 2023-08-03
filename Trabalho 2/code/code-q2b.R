@@ -1,3 +1,179 @@
+# ============== TAXAS MASCULINA ==============
+"Numero de Nascimentos po IDADE da mãe"
+
+sinasc.PROJ <-
+  microdatasus::fetch_datasus(
+      uf = "GO",
+      year_start = 2010,
+      year_end = 2010,
+      information_system = "SINASC",
+      vars = c("DTNASC", "SEXO", "IDADEMAE") # IDADEMÃE para Construir GRUPOS-ETÁRIOS
+    ) |>
+  dplyr::mutate(
+    IDADEMAE = as.numeric(as.character(IDADEMAE)),
+    DTNASC = format(lubridate::dmy(DTNASC), "%Y"),
+    GRUPO = cut(
+      IDADEMAE,
+      c(15, 20, 25, 30, 35, 40, 45, 50),
+      labels = c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49"),
+      include.lowest = TRUE
+    ),
+    contador = 1,
+    SEXO = dplyr::case_when(
+      SEXO %in% "1" ~ "M",
+      SEXO %in% "2" ~ "F",
+      SEXO %in% "0" ~ "I",
+      TRUE ~ SEXO
+    ),
+    GRUPO = factor(
+      GRUPO,
+      levels = c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49")
+    ),
+  ) |>
+  dplyr::filter(
+    !(
+      GRUPO %in% c(NA, "NA") | SEXO %in% c("I", 0, "0", NA)
+    )
+  ) |>
+  # "IDADEMA usado para criar os GRUPOS-ETÁRIOS"
+  dplyr::select(-"IDADEMAE") |>
+  tidyr::pivot_wider(
+    names_from = DTNASC, # os Nomes das NOVAS COLUNAS vem de 'ano'
+    values_from = contador, # os valores paras as NOVAS COLUNAS vem de 'contador'
+    # como ignora-se valores únicos como: "IDADE", "DTOBITO")
+    values_fn = list(contador = sum)
+    # Podemos somar os valores repetidos atraves de 'contador'
+  ) |>
+  dplyr::arrange(SEXO, GRUPO)
+
+#  <================== FECUNDIDADE =====================>
+View(sinasc.PROJ)
+
+# pop2010 <- 
+pop2010 |>
+  dplyr::rename(
+    "SEXO" = "sexo",
+    "GRUPO" = "fxetaria",
+    "Npop2010" = "populacao",
+  ) |>
+  dplyr::filter(
+    GRUPO %in% c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49")
+  ) |>
+  dplyr::mutate(
+    SEXO = dplyr::case_when(
+      SEXO %in% "1" ~ "M",
+      SEXO %in% "2" ~ "F",
+      SEXO %in% "9" ~ "I",
+      TRUE ~ SEXO
+    ),
+  )  |>
+dplyr::select(-'SEXO') |>
+  dplyr::select(-'SEXO')  |>
+  dplyr::group_by(GRUPO) |>
+  dplyr::summarise( 'Npop2010' = sum)
+
+
+
+View(pop2010)
+View(sinasc.PROJ)
+#  <================== =====================>
+
+sinasc.Fecund <-
+  merge(
+    x = sinasc.PROJ, y = pop2010,
+    by = c("SEXO", "GRUPO")
+  ) |>
+  dplyr::select(-'SEXO') |>
+  dplyr::mutate(
+    tef2010 = purrr::map2(
+      .x = `2010`, 
+      .y = Npop2010,
+      .f = ~round((.x/.y), digits = 4)
+    )
+  )
+
+
+View(sinasc.Fecund)
+#  <================== =====================>
+
+sinascdf |>
+  dplyr::mutate(
+    ano = format(lubridate::dmy(DTNASC), "%Y"),
+    contador = 1,
+    SEXO = dplyr::case_when(
+      SEXO %in% "1" ~ "M",
+      SEXO %in% "2" ~ "F",
+      SEXO %in% "0" ~ "I",
+      TRUE ~ SEXO
+    )
+  ) |>
+  dplyr::group_by(SEXO, ano) |>
+  dplyr::summarise(
+    NumNascidos = sum(as.numeric(contador))
+  ) |>
+  dplyr::filter(
+    !SEXO %in% "I"
+  )
+
+View(sinascdf)
+
+
+#  <================== =====================>
+'As colunas 2015 e 2016 são o NÚMERO de nascidos nesses anos'
+#  <================== =====================>
+
+popIBGE2015 <-
+  popIBGE2015 |>
+  dplyr::rename(
+    "SEXO" = "sexo",
+    "GRUPO" = "fxetaria",
+    "pop2015" = "populacao",
+  ) |>
+  dplyr::filter(
+    GRUPO %in% c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49")
+  )
+
+popIBGE2020 <-
+  popIBGE2020 |>
+  dplyr::rename(
+    "SEXO" = "sexo",
+    "GRUPO" = "fxetaria",
+    "pop2020" = "populacao",
+  ) |>
+  dplyr::filter(
+    GRUPO %in% c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49")
+  )
+
+#  <================== =====================>
+
+  purrr::map(
+    .x = 2010,
+    .f = ~ microdatasus::fetch_datasus(
+      uf = "GO",
+      year_start = .x,
+      year_end = .x,
+      information_system = "SINASC",
+      vars = c("DTNASC", "SEXO", "IDADEMAE") # IDADEMÃE para Construir GRUPOS-ETÁRIOS
+    )
+  ) |>
+    dplyr::bind_rows()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
  # SEXO %in% "F" & ano %in% 2014 ~ 48682,
   # SEXO %in% "M" & ano %in% 2014 ~ 50959,
   NumNascidos2014 = dplyr::if_else(SEXO %in% "F", 48682,
