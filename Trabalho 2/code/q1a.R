@@ -102,7 +102,7 @@ Plotpop1991 <-
     x = "Grupos Etários",
     y = "Proporção da população",
     # color = "Sexo",
-    title = "Pirâmide Etária do Censo de 1991, Goiás",
+    title = "Pirâmide Etária de 1991, Goiás",
     caption = "Fonte: DATASUS, 1991"
   )
 
@@ -335,17 +335,16 @@ Plotpop2015IBGE <-
   ) +
   geom_line(
     data = dplyr::filter(popIBGE2015, sexo == "M"),
-    aes(y = -porcentagem),
+    aes(y = porcentagem),
     position = position_dodge(width = 0.8),
     size = 1.5,
   ) +
   geom_line(
     data = dplyr::filter(popIBGE2015, sexo == "F"),
-    aes(y = porcentagem),
+    aes(y = -porcentagem),
     position = position_dodge(width = 0.8),
     size = 1.5,
   ) +
-  coord_flip() +
   scale_y_continuous(
 #    labels = function(x) paste(abs(x), "%"),
 #    limits = c(-10, 10),
@@ -363,6 +362,7 @@ Plotpop2015IBGE <-
     aesthetics = "color",
     labels = c("Homens", "Mulheres")
   ) +
+  coord_flip() +
   geom_hline(yintercept = 0, color = "#6f5d5d", size = .5, linetype = "solid") +
   # girar gráfico
   theme(
@@ -418,13 +418,13 @@ Plotpop2020IBGE <-
   ) +
   geom_line(
     data = dplyr::filter(popIBGE2020, sexo == "M"),
-    aes(y = -porcentagem),
+    aes(y = porcentagem),
     position = position_dodge(width = 0.8),
     size = 1.5,
   ) +
   geom_line(
     data = dplyr::filter(popIBGE2020, sexo == "F"),
-    aes(y = porcentagem),
+    aes(y = -porcentagem),
     position = position_dodge(width = 0.8),
     size = 1.5,
   ) +
@@ -499,13 +499,13 @@ Plotpop2030IBGE <-
   ) +
   geom_line(
     data = dplyr::filter(popIBGE2030, sexo == "M"),
-    aes(y = -porcentagem),
+    aes(y = porcentagem),
     position = position_dodge(width = 0.8),
     linewidth = 1.5,
   ) +
   geom_line(
     data = dplyr::filter(popIBGE2030, sexo == "F"),
-    aes(y = porcentagem),
+    aes(y = -porcentagem),
     position = position_dodge(width = 0.8),
     linewidth = 1.5,
   ) +
@@ -562,6 +562,7 @@ ggsave(
 
 # Comente os resultados à luz da discussão
 # sobre transição demográfica.
+
 
 Plotpop1991
 Plotpop2000
