@@ -18,7 +18,7 @@ sinasc.Fecund <-
     year_start = 2014,
     year_end = 2016,
     information_system = "SINASC",
-    vars = c("DTNASC", "IDADEMAE","SEXO") # IDADEMÃE para Construir GRUPOS-ETÁRIOS
+    vars = c("DTNASC", "IDADEMAE", "SEXO") # IDADEMÃE para Construir GRUPOS-ETÁRIOS
   ) |>
   dplyr::mutate(
     IDADEMAE = as.numeric(as.character(IDADEMAE)),
@@ -33,16 +33,16 @@ sinasc.Fecund <-
     SEXO = dplyr::case_when(
       SEXO %in% "1" ~ "M",
       SEXO %in% "2" ~ "F",
-      SEXO %in% c(0,'0',9,"9") ~ "I",
+      SEXO %in% c(0, "0", 9, "9") ~ "I",
       TRUE ~ SEXO
-    ),,
+    ),
     GRUPO = factor(
       GRUPO,
       levels = c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49")
     ),
   ) |>
   dplyr::filter(
-    !(GRUPO %in% c(NA, "NA"))
+    !(GRUPO %in% c(NA, "NA") | SEXO %in% c(0, "0", "I", NA, "NA"))
   ) |>
   # "IDADEMA usado para criar os GRUPOS-ETÁRIOS"
   dplyr::select(-"IDADEMAE") |>
@@ -53,29 +53,26 @@ sinasc.Fecund <-
     values_fn = list(contador = sum)
     # Podemos somar os valores repetidos atraves de 'contador'
   ) |>
-  dplyr::arrange(SEXO,GRUPO)
-  
-  sinasc.Fecund
-  
-  dplyr::mutate(
-    # nascimentos médios do triênio - população projetada pelo IBGE para 2015
-    nNx_media = purrr::pmap_dbl(
-      .l = list(`2014`, `2015`, `2016`),
-      # .f = function(x, y, z) {
-      .f = \(x, y, z){
-        round(
-           ( (x + y + z) / 3 ),
-          digits = 2
-        )
-      }
-    )
-  )  |>
-  dplyr::select(c("GRUPO","nNx_media"))
+  dplyr::arrange(SEXO, GRUPO) |>
+dplyr::mutate(
+  # nascimentos médios do triênio - população projetada pelo IBGE para 2015
+  nNx_media = purrr::pmap_dbl(
+    .l = list(`2014`, `2015`, `2016`),
+    # .f = function(x, y, z) {
+    .f = \(x, y, z){
+      round(
+        ((x + y + z) / 3),
+        digits = 2
+      )
+    }
+  )
+) |>
+  dplyr::select(c("GRUPO", "SEXO","nNx_media"))
 
 View(sinasc.Fecund)
 
 
-'POPULAÇÃO FEMININA 2010'
+"POPULAÇÃO FEMININA 2010"
 
 popFem2015 <-
   popIBGE2015 |>
@@ -87,10 +84,10 @@ popFem2015 <-
   dplyr::filter(
     (
       GRUPO %in% c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49") &
-        SEXO %in% c(2, "2", "F")
+        SEXO %in% c(2, "2", "F", 1, "1", "M")
     )
   ) |>
-  dplyr::select(c("GRUPO", "pop2015"))
+  dplyr::select(c("GRUPO", "SEXO", "pop2015"))
 
 View(popFem2015)
 
@@ -100,19 +97,22 @@ View(popFem2015)
 tefFemini2015 <-
   merge(
     x = sinasc.Fecund, y = popFem2015,
-    by = "GRUPO"
+    by = c("GRUPO","SEXO")
   ) |>
-  dplyr::select(-"SEXO") |>
   dplyr::mutate(
     tef2010 = purrr::map2(
       .x = nNx_media,
       .y = pop2015,
       .f = ~ round((.x / .y), digits = 4)
     )
-  ) |> dplyr::select(GRUPO, tef2010)
+  ) |>
+  dplyr::select(GRUPO, SEXO, tef2010) |>
+  dplyr::arrange(SEXO, GRUPO)
 
+View(tefFemini2015)
 
-'JUNTANDO BASES PARA CALCULAR TEF CONSTANTE - 2010'
+"JUNTANDO BASES PARA CALCULAR TEF CONSTANTE - 2010"
+Projpop2010 <- 
 pop2010 |>
   dplyr::rename(
     "SEXO" = "sexo",
@@ -120,30 +120,58 @@ pop2010 |>
     "Npop2010" = "populacao",
   ) |>
   dplyr::filter(
-    GRUPO %in% c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49")
+    (
+      GRUPO %in% c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49") &
+        SEXO %in% c(2, "2", "F", 1, "1", "M")
+    )
   ) |>
   dplyr::mutate(
     SEXO = dplyr::case_when(
       SEXO %in% "1" ~ "M",
       SEXO %in% "2" ~ "F",
-      SEXO %in% "9" ~ "I",
+      SEXO %in% c(0,"9") ~ "I",
       TRUE ~ SEXO
     ),
-  )  |>
-dplyr::select(-'SEXO') |>
-  dplyr::select(-'SEXO')  |>
-  dplyr::group_by(GRUPO) |>
-  dplyr::summarise( 'Npop2010' = sum)
+  )
 
-merge(x = pop2010, y = tefFemini2015, by = 'GRUPO')
+Projpop2010
+tefFemini2015
 
+# ============ 'NASCIMENTOS MÉDIOS ==> bar{B}' ============
 
-View(tefFemini2015)
+TEFB_bar_pop2010 <- 
+merge(x = Projpop2010, y = tefFemini2015, by = c('GRUPO','SEXO')) |>
+dplyr::mutate(
+  B_bar = purrr::map2(
+  .x = Npop2010, .y =  tef2015, 
+  .f = ~round( ( (.x*.y) ), digits = 0 )
+  )
+) |>
+dplyr::arrange(SEXO,GRUPO)
 
+TEFB_bar_pop2010
+
+# TEFB_bar_pop2010 |> 
+# dplyr::filter( SEXO %in% 'F')  |>
+# dplyr::select(B_bar)
+# 
+# 
+# TEFB_bar_pop2010 |> 
+# dplyr::filter( SEXO %in% 'M') |>
+# dplyr::select(B_bar)
+
+readODS::write_ods(
+  x = TEFB_bar_pop2010,
+  path = "Trabalho 2/result/tabelas/TEFB_bar_pop2010-TabVida.ods",
+  row_names = FALSE
+)
+
+View(TEFB_bar_pop2010)
 
 
 "EXPORTANDO PARA EXCEL"
 
+TEFB_bar_pop2010
 # ============== FINAL :TAXAS FECUNDIDADE CONSTANTE ==============
 
 
