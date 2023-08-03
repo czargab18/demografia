@@ -11,12 +11,15 @@ link: https://www.ibge.gov.br/estatisticas/sociais/populacao/9662-censo-demograf
 "Numero de Nascimentos po IDADE da mãe"
 
 sinasc.PROJ <-
-  microdatasus::fetch_datasus(
-    uf = "GO",
-    year_start = 2014,
-    year_end = 2016,
-    information_system = "SINASC",
-    vars = c("DTNASC", "SEXO", "IDADEMAE") # IDADEMÃE para Construir GRUPOS-ETÁRIOS
+  purrr::map(
+    .x = c(2015, 2020),
+    .f = microdatasus::fetch_datasus(
+      uf = "GO",
+      year_start = .x,
+      year_end = 2016,
+      information_system = "SINASC",
+      vars = c("DTNASC", "SEXO", "IDADEMAE") # IDADEMÃE para Construir GRUPOS-ETÁRIOS
+    )
   ) |>
   # dplyr::select(-"DTNASC") |>
   dplyr::mutate(
