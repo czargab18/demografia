@@ -8,16 +8,58 @@
 link: https://www.ibge.gov.br/estatisticas/sociais/populacao/9662-censo-demografico-2010.html?=&t=downloads
 "
 # ============== TAXAS MASCULINA ==============
-"Numero de Nascimentos po IDADE"
+"Numero de Nascimentos po IDADE da mãe"
 
-sinascdf <-
+sinasc.PROJ <-
   microdatasus::fetch_datasus(
     uf = "GO",
     year_start = 2014,
     year_end = 2016,
     information_system = "SINASC",
-    vars = c("DTNASC", "SEXO")
+    vars = c("DTNASC", "SEXO", "IDADEMAE") # IDADEMÃE para Construir GRUPOS-ETÁRIOS
   ) |>
+  # dplyr::select(-"DTNASC") |>
+  dplyr::mutate(
+    IDADEMAE = as.numeric(as.character(IDADEMAE)),
+    DTNASC = format(lubridate::dmy(DTNASC), "%Y"),
+    GRUPO = cut(
+      IDADEMAE,
+      c(15, 20, 25, 30, 35, 40, 45, 50),
+      labels = c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49"),
+      include.lowest = TRUE
+    ),
+    contador = 1,
+    SEXO = dplyr::case_when(
+      SEXO %in% "1" ~ "M",
+      SEXO %in% "2" ~ "F",
+      SEXO %in% "0" ~ "I",
+      TRUE ~ SEXO
+    ),
+    GRUPO = factor(
+      GRUPO,
+      levels = c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49")
+    ),
+  ) |>
+  dplyr::filter(
+    !(
+      GRUPO %in% c(NA, "NA") | SEXO %in% c("I", 0, "0", NA)
+    )
+  ) |>
+  # "IDADEMA usado para criar os GRUPOS-ETÁRIOS"
+  dplyr::select(-"IDADEMAE") |>
+  tidyr::pivot_wider(
+    names_from = DTNASC, # os Nomes das NOVAS COLUNAS vem de 'ano'
+    values_from = contador, # os valores paras as NOVAS COLUNAS vem de 'contador'
+    # como ignora-se valores únicos como: "IDADE", "DTOBITO")
+    values_fn = list(contador = sum)
+    # Podemos somar os valores repetidos atraves de 'contador'
+  ) |>
+  dplyr::arrange(SEXO, GRUPO)
+
+
+View(sinasc.PROJ)
+
+sinascdf |>
   dplyr::mutate(
     ano = format(lubridate::dmy(DTNASC), "%Y"),
     contador = 1,
@@ -121,7 +163,7 @@ simdf <-
         IDADE %in% c(999, "999", NA, 0, "0") |
         SEXO %in% c("0", 0, "I", "i")
     )
-  )  |>
+  ) |>
   dplyr::select(-c("IDADE", "DTOBITO")) |>
   # PIVOTEANDO APENAS A COLUNA: |=========> ANO <=========|
   tidyr::pivot_wider(
@@ -132,41 +174,41 @@ simdf <-
     # Podemos somar os valores repetidos atraves de 'contador'
   ) |>
   # JUNTANDO NÚMERO DE ÓBITOS COM NASCIDOS VIVOS - Manualmente
-dplyr::mutate(
-   # óbitos médios do triênio e população projetada pelo
-  #   IBGE para 2015
-  nDx_media = purrr::pmap_dbl(
-    .l = list(`2014`, `2015`, `2016`),
-    .f = \(x, y, z){
-      round(
-        ((x + y + z) / 3),
-        digits = 2
-      )
-    }
-  ),
+  dplyr::mutate(
+    # óbitos médios do triênio e população projetada pelo
+    #   IBGE para 2015
+    nDx_media = purrr::pmap_dbl(
+      .l = list(`2014`, `2015`, `2016`),
+      .f = \(x, y, z){
+        round(
+          ((x + y + z) / 3),
+          digits = 2
+        )
+      }
+    ),
     grupo_etario = as.character(grupo_etario)
-) |>
+  ) |>
   dplyr::select(c("SEXO", "grupo_etario", "nDx_media")) |>
-  dplyr::arrange("grupo_etario","SEXO")
+  dplyr::arrange("grupo_etario", "SEXO")
 
 
 
 # POPTBR10.csv  2010 ----
-'data foi pego de ~/code/ImportData.R'
-pop2010 <- 
-pop2010 |>
-dplyr::rename('SEXO'= 'sexo', 'grupo_etario' = 'fxetaria') |>
-dplyr::mutate(
-  SEXO = dplyr::if_else(SEXO %in% '1', 'M','F')
-)
+"data foi pego de ~/code/ImportData.R"
+pop2010 <-
+  pop2010 |>
+  dplyr::rename("SEXO" = "sexo", "grupo_etario" = "fxetaria") |>
+  dplyr::mutate(
+    SEXO = dplyr::if_else(SEXO %in% "1", "M", "F")
+  )
 
 
-simdfPop2010 <- 
-merge(x = simdf,y = pop2010, by = c("SEXO", 'grupo_etario')) |>
-dplyr::mutate(
+simdfPop2010 <-
+  merge(x = simdf, y = pop2010, by = c("SEXO", "grupo_etario")) |>
+  dplyr::mutate(
     grupo_etario = factor(grupo_etario, levels = ordemetaria),
-) |>
-dplyr::arrange(SEXO,grupo_etario)
+  ) |>
+  dplyr::arrange(SEXO, grupo_etario)
 
 View(simdfPop2010)
 
