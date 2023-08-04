@@ -14,7 +14,12 @@
 
 # - idade presumida (índices de Whipple, Myers e Bachi)
 
+
+
+# ===========================  ===========================
+
 # - Construa a pirâmide por idade simples
+
 
 # =========================== ler .ods ===========================
 
@@ -105,30 +110,34 @@ library(ggplot2)
 PlotpopDeclar <-
     ggplot(
         data = popDeclar,
-        aes(x = idadeSimples, group = sexoDeclar, fill = sexoDeclar)
+        aes(x = idadeSimples, group = sexoDeclar, color = sexoDeclar)
     ) +
-    ggplot2::geom_bar(
-        data = filter(popDeclar, sexoDeclar == "mulher"),
-        aes(y = Porcendeclarada), stat = "identity", position = position_dodge(1)
-    ) +
-    ggplot2::geom_bar(
-        data = filter(popDeclar, sexoDeclar == "homem"),
-        aes(y = -Porcendeclarada), stat = "identity", position = position_dodge(1)
-    ) +
+    geom_line(
+    data =  dplyr::filter(popDeclar, sexoDeclar %in% "homem"),
+     aes(y = Porcendeclarada),
+    position = position_dodge(width = 0.8),
+    linewidth = 1.2,
+  ) +
+    geom_line(
+    data =  dplyr::filter(popDeclar, sexoDeclar %in% "mulher"),
+     aes(y = -Porcendeclarada),
+    position = position_dodge(width = 0.8),
+    linewidth = 1.2,
+  ) +
     ggplot2::coord_flip() +
+    scale_color_manual(
+        values = c("#f95d06", "#343496"),
+        aesthetics = "color",
+        labels = c("Homens", "Mulheres")
+    )    +
     scale_x_discrete(
         breaks = seq(0, 100, 5)
     ) +
     scale_y_continuous(
-        labels = function(x) paste(abs(x) * 100, "%")
+        labels = function(x) paste(abs(x), "%")
     ) +
     theme_minimal() +
     # ROTULOS (1 == HOMEM &&& 2 == MULHER)
-    scale_color_manual(
-        values = c("#f95d06", "#343496"),
-        aesthetics = "fill",
-        labels = c("Homens", "Mulheres")
-    ) +
     theme(
         plot.title = element_text(size = 16, face = "bold"),
         panel.grid.major.x = element_line(linewidth = 0.7, color = "#e5dfdf"),
@@ -141,14 +150,14 @@ PlotpopDeclar <-
         legend.text = element_text(size = 16),
         legend.position = "bottom",
         plot.caption = element_text(size = 12, hjust = 0),
-        plot.margin = margin(t = 10, r = 20, b = 10, l = 10),
+        # plot.margin = margin(t = 10, r = 20, b = 10, l = 10),
         # plot.background = element_rect(fill = "green")
     ) +
     labs(
         x = "Idade Simples",
-        y = "Distribuição da população com Idade Declarada \n (em milhares de pessoas)",
+        y = "Proporção da população",
         # color = "Sexo",
-        title = "Pirâmide Etária da populaçâo censitária de 2010, Goiás",
+        title = "IDADE DECLARADA",
         caption = "Fonte: DATASUS, 2010"
     )
 
@@ -160,7 +169,7 @@ ggsave(
     filename = "PlotpopDeclar.png",
     plot = PlotpopDeclar,
     path = "Trabalho 2/result/figuras/",
-    scale = 1,
+    scale = 1.5,
     dpi = 300,
     limitsize = TRUE,
     bg = "#f5f5f7",
@@ -176,16 +185,20 @@ PlotpopDtNascim <-
     # gráfico
     ggplot(
         data = popDtNascim,
-        aes(x = idadeSimples, group = sexoDTNasc, fill = sexoDTNasc)
+        aes(x = idadeSimples, group = sexoDTNasc, color = sexoDTNasc)
     ) +
-    ggplot2::geom_bar(
-        data = filter(popDtNascim, sexoDTNasc == "mulher"),
-        aes(y = PorcenderDtNasc), stat = "identity", position = position_dodge(1)
-    ) +
-    ggplot2::geom_bar(
-        data = filter(popDtNascim, sexoDTNasc == "homem"),
-        aes(y = -PorcenderDtNasc), stat = "identity", position = position_dodge(1)
-    ) +
+    geom_line(
+    data =  dplyr::filter(popDtNascim, sexoDTNasc %in% "homem"),
+     aes(y = PorcenderDtNasc),
+    position = position_dodge(width = 0.8),
+    linewidth = 1.2,
+  ) +
+    geom_line(
+    data =  dplyr::filter(popDtNascim, sexoDTNasc %in% "mulher"),
+     aes(y = -PorcenderDtNasc),
+    position = position_dodge(width = 0.8),
+    linewidth = 1.2,
+  ) +
     ggplot2::coord_flip() +
     scale_x_discrete(
         breaks = seq(0, 100, 5)
@@ -197,7 +210,7 @@ PlotpopDtNascim <-
     # ROTULOS (1 == HOMEM &&& 2 == MULHER)
     scale_color_manual(
         values = c("#f95d06", "#343496"),
-        aesthetics = "fill",
+        aesthetics = "color",
         labels = c("Homens", "Mulheres")
     ) +
     theme(
@@ -212,14 +225,14 @@ PlotpopDtNascim <-
         legend.text = element_text(size = 16),
         legend.position = "bottom",
         plot.caption = element_text(size = 12, hjust = 0),
-        plot.margin = margin(t = 10, r = 20, b = 10, l = 10),
+        # plot.margin = margin(t = 10, r = 20, b = 10, l = 10),
         # plot.background = element_rect(fill = "green")
     ) +
     labs(
         x = "Idade Simples",
-        y = "Distribuição da população por Data de nascimentos \n (em milhares de pessoas)",
+        y = "Proporção da Populaçã",
         # color = "Sexo",
-        title = "Pirâmide Etária da populaçâo censitária de 2010, Goiás",
+        title = "DATA NASCIMENTO",
         caption = "Fonte: DATASUS, 2010"
     )
 
@@ -229,10 +242,9 @@ ggsave(
     filename = "PlotpopDtNascim.png",
     plot = PlotpopDtNascim,
     path = "Trabalho 2/result/figuras/",
-    scale = 1,
+    scale = 1.5,
     dpi = 300,
     limitsize = TRUE,
     bg = "#f5f5f7",
     #   units = "cm",
 )
-

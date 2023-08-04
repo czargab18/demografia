@@ -160,6 +160,8 @@
       dplyr::ungroup() |> dplyr::select(populacao) |> sum()
   )
 
+
+
 # q1b pop2010 ----
 
 # - proporção de idosos (60 anos e mais)
@@ -235,6 +237,7 @@
       ) |>
       dplyr::ungroup() |> dplyr::select(populacao) |> sum()
   )
+
 
 
 
@@ -753,7 +756,7 @@ popIBGE2030 |>
 # [1] 35.98508
 
 
-# Média
+# Média ======================================================
 
 # media pop1991
 
@@ -948,6 +951,16 @@ print(round(meanpopIBGE2030, digits = 2))
 
 
 
+
+
+
+
+
+
+
+
+
+
 # RSexo 2000, 2010, 2030 ----
 ordemetaria <-
   c(
@@ -986,7 +999,7 @@ RS.2000 <-
     ),
     ano = 2000
   ) |>
-  unnest(RS)
+  tidyr::unnest(RS)
 
 RS.2000
 
@@ -1019,7 +1032,7 @@ RS.2010 <-
     ),
     ano = 2010
   ) |>
-  unnest(RS)
+  tidyr::unnest(RS)
 
 # RS.2030
 
@@ -1056,8 +1069,8 @@ RS.2030 <-
     ),
     Ano = 2000
   ) |>
-  unnest(RS) |>
-  rename(fxetaria = fxetaria)
+    tidyr::unnest(RS)
+  dplyr::rename(fxetaria = fxetaria)
 
 RS.2030
 
@@ -1081,7 +1094,6 @@ Completo.RS <-
   ) |>
   dplyr::arrange(fxetaria)
 
-
 Completo.RS
 
 
@@ -1093,15 +1105,10 @@ PlotRS0porgrupo <-
     aes(y = RS, color = Ano, group = Ano),
     size = 1.2,
   ) +
+  geom_hline(yintercept = 1, color = "#6f5d5d", size = .5, linetype = "solid") +
   scale_y_continuous(
     limits = c(0, 1.25),
     breaks = seq(0, 1.25, 0.5)
-  ) +
-  geom_hline(yintercept = 1.05, color = "#0d0d0d", size = .5, linetype = "solid") +
-  geom_text(
-    x = "65-69", y = 1.05,
-    label = " Razão de sexo do Brasil: 1.05",
-    color = "#636363", size = 4, vjust = -1
   ) +
   scale_color_manual(
     aesthetics = "color",
@@ -1115,7 +1122,7 @@ PlotRS0porgrupo <-
     plot.title = element_text(size = 20, face = "bold"),
     panel.grid.major.x = element_line(linewidth = 0.4, color = "#e5dfdf"),
     panel.grid.major.y = element_line(linewidth = 0.25),
-    axis.text.x = element_text(size = 14, face = "plain"),
+    axis.text.x = element_text(size = 12, face = "plain"),
     axis.text.y = element_text(size = 14, face = "plain"),
     axis.title.x = element_text(size = 14, face = "bold"),
     axis.title.y = element_text(size = 14, face = "bold"),
@@ -1127,7 +1134,7 @@ PlotRS0porgrupo <-
   ) +
   labs(
     x = "Grupos Etários",
-    y = "Raza De Sexo",
+    y = "Raza De Sexo (escala Logarítmica)",
     title = "Razão de sexo em Goiás por grupo etário",
     caption = "Fonte: DATASUS - 2000 e 2010 e projeção IBGE - 2030"
   )
@@ -1138,7 +1145,7 @@ ggsave(
   filename = "PlotRS0porgrupo.png",
   plot = PlotRS0porgrupo,
   path = "Trabalho 2/result/figuras/",
-  scale = .85,
+  scale = 1.3,
   dpi = 300,
   limitsize = TRUE,
   bg = "#f5f5f7"
@@ -1175,3 +1182,5 @@ rm(popIBGE2010)
 rm(popIBGE2015)
 rm(popIBGE2020)
 rm(popIBGE2030)
+
+
