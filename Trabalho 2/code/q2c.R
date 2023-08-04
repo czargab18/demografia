@@ -19,7 +19,7 @@ ordemetaria<-
     "70-74","75-79","80-84","85-89","90+")
 
 dadoq2c<-
-  readxl::read_xlsx('Trabalho 2/dataProject/q2c.xlsx')
+  readxl::read_xlsx('data/T2/q2c.xlsx')
 
 
 dadoq2c<-
@@ -41,7 +41,7 @@ dadoq2c<-
                                                    if_else(Ano == '2060 H', 'Homen',Ano)))))),
     Ano = str_remove_all(Ano, pattern = ' H'),
     Populacao = abs(Populacao),
-    `GRUPO ETÁRIO` = factor(forcats::as_factor(`GRUPO ETÁRIO`),  levels = ordemetaria)
+    `GRUPO ETÁRIO` = factor(forcats::as_factor(`GRUPO ETÁRIO`),  levels = ordemetaria),
   )
   
   
@@ -51,17 +51,26 @@ dadoq2c
 library(tidyverse)
 
 Plotq2c<-
-  ggplot2::ggplot(data = dadoq2c, mapping = aes(x = `GRUPO ETÁRIO`)) +
-  ggplot2::geom_bar(
+  ggplot2::ggplot(
+    data = dadoq2c,
+    mapping = aes(x = `GRUPO ETÁRIO`,group = sexo, color = sexo)
+    ) +
+  ggplot2::geom_line(
     data = filter(dadoq2c, sexo == 'Mulher'),
-    aes(y = Populacao, fill = sexo),  stat = "identity") +
-    
-  ggplot2::geom_bar(
+    aes(y = Populacao, color = sexo), 
+    position = position_dodge(width = 0.8),
+    size = 1.5,
+    ) +
+  ggplot2::geom_line(
     data = filter(dadoq2c, sexo == 'Homen'),
-    aes(y = -Populacao, fill = sexo), stat = "identity") +
+    aes(y = -Populacao, color = sexo),
+     position = position_dodge(width = 0.8),
+    size = 1.5,
+    ) +
   
   scale_color_manual(
-    values =  c('#f95d06','#343496'),aesthetics = 'fill',
+    values =  c('#f95d06','#343496'),
+    aesthetics = 'color',
     labels = c("Mulheres","Homens")) +
   
   
@@ -73,19 +82,21 @@ Plotq2c<-
   
   # girar gráfico 
   ggplot2::coord_flip() +
-    facet_wrap(~Ano) +
-    
+    facet_wrap(~Ano) +    
   theme_minimal() +
   
   theme(
     panel.grid.major.x = element_line(linewidth = 0.7, color = "gray"),
     panel.grid.major.y = element_line(linewidth = 0.5),
     axis.text.x = element_text(size = 14),
-    axis.text.y = element_text(size = 12)
+    axis.text.y = element_text(size = 12),
+        legend.position = "bottom",
+            legend.title = element_blank(),
+    aspect.ratio = 2
   ) +
   labs(
     x = "Grupos Etários",
-    y = "Distribuição da população \n (em milhares de pessoas)",
+    y = "População (em milhares em milhares)",
     fill = "Sexo",
     title = "Pirâmide Etária de 2010, 2020 e 2060, Brasil ",
     caption = "Fonte: Projeção IBGE, revisão 2018"
@@ -98,8 +109,8 @@ Plotq2c
 ggsave(
   filename = 'Plotq2c.png',
   plot = Plotq2c,
-  path = 'Trabalho 2/figuras/',
-  scale = 2,
+  path = 'Trabalho 2/result/figuras',
+  scale = 1,
   dpi = 300,
   limitsize = TRUE,
   bg = '#f5f5f7'
